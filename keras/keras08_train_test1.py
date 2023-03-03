@@ -16,11 +16,12 @@ y_test = np.array([8,9,10])
 #2. 모델구성
 model = Sequential()
 model.add(Dense(10, input_dim=1))
+model.add(Dense(5))
 model.add(Dense(1))
 
 #3. 컴파일, 훈련
 model.compile(loss='mae', optimizer='adam')
-model.fit(x_train, y_train, epochs=150, batch_size=2)
+model.fit(x_train, y_train, epochs=100, batch_size=2)
 
 #4. 평가, 예측
 loss = model.evaluate(x_test, y_test) #x_test / y_test는 훈련에 포함되지 않는다

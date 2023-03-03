@@ -13,8 +13,8 @@ from sklearn.model_selection import train_test_split
 
 x_train, x_test, y_train, y_test = train_test_split(
 x, y, 
-#train_size=0.7,
-test_size=0.3,
+train_size=0.6,
+test_size=0.3, # 둘 중 하나만 써도 된다
 random_state=1234, 
 shuffle=True,
 #랜덤 시드라는게 있고 정의되어있는 표가 있다 랜덤시드로 고정을 시켜놓고 돌린다
