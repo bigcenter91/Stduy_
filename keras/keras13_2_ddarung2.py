@@ -115,6 +115,10 @@ def RMSE(y_test, y_predict): #재사용 할 때 함수를 쓴다/ RMSE라는 함
 rmse = RMSE(y_test, y_predict) # 정의한 RMSE 사용
 print("RMSE : ", rmse)
 
+<<<<<<< HEAD
+=======
+'''
+>>>>>>> 9df139f (keras)
 ##### submission.csv를 만들어봅시다 #####
 #print(test_csv.isnull().sum())  # 여기도 결측치가 있다
 y_submit = model.predict(test_csv)
@@ -126,3 +130,7 @@ submission['count'] = y_submit
 print(submission)
 
 submission.to_csv(path + 'submit_0306_0724.csv')
+<<<<<<< HEAD
+=======
+'''
+>>>>>>> 9df139f (keras)
