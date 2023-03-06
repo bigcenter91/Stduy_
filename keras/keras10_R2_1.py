@@ -28,6 +28,8 @@ model.add(Dense(1))
 model.compile(loss='mse', optimizer='adam')
 model.fit(x_train, y_train, epochs=300, batch_size=5)
 
+
+#4. 평가, 예측
 loss = model.evaluate(x_test, y_test)
 print("loss : ", loss)
 
@@ -41,6 +43,8 @@ r2 = r2_score(y_test, y_predict)
 print('r2 스코어 : ', r2)
 
 #r2 스코어 0.99로 맞춰봐라
+#r2값이 -1가 나오면 안좋은 지표다 r2는 보조지표다 loss와 같이 판단한다
+
 
 #train_size /random_state  변경해도 된다
 

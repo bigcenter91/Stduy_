@@ -6,7 +6,6 @@ from tensorflow.keras.layers import Dense, LeakyReLU
 import numpy as np
 
 
-
 #1. 데이터
 datasets = fetch_california_housing()
 x = datasets.data
@@ -28,14 +27,14 @@ model.add(Dense(30, activation=LeakyReLU()))
 model.add(Dense(40, activation=LeakyReLU()))
 model.add(Dense(80, activation=LeakyReLU()))
 model.add(Dense(60, activation=LeakyReLU()))
-model.add(Dense(40, activation=LeakyReLU()))
+model.add(Dense(30, activation=LeakyReLU()))
 model.add(Dense(20, activation=LeakyReLU()))
-model.add(Dense(15, activation=LeakyReLU()))
+model.add(Dense(8, activation=LeakyReLU()))
 model.add(Dense(1))
 
 #3. 컴파일, 훈련
 model.compile(loss= 'mse', optimizer='adam' )
-model.fit(x_train, y_train, epochs=10, batch_size=8)
+model.fit(x_train, y_train, epochs=10, batch_size=4)
 
 
 #4. 평가, 예측
