@@ -75,7 +75,7 @@ print(y_train.shape, y_test.shape) # (7620,) (3266,)
 
 #2. 모델 구성
 model = Sequential()
-model.add(Dense(10, input_dim=8))
+model.add(Dense(10, input_dim=8, activation='sigmoid'))
 model.add(Dense(30, activation='relu'))
 model.add(Dense(50, activation='relu')) #리니어는 디포트로 되어있는거다 그냥 대각선
 model.add(Dense(60, activation='relu'))
