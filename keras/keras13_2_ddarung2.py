@@ -116,10 +116,6 @@ def RMSE(y_test, y_predict): #재사용 할 때 함수를 쓴다/ RMSE라는 함
 rmse = RMSE(y_test, y_predict) # 정의한 RMSE 사용
 print("RMSE : ", rmse)
 
-#로컬과 평가지표는 다를 것이다
-#일반적인 대회는 50프로만 공개하기 때문에 상대적이다
-
-
 
 ##### submission.csv를 만들어봅시다 #####
 #print(test_csv.isnull().sum())  # 여기도 결측치가 있다
@@ -131,4 +127,4 @@ print(submission)
 submission['count'] = y_submit
 print(submission)
 
-submission.to_csv(path_save + 'submit_0306_0724.csv')
+submission.to_csv(path_save + 'submit_0303.csv')
