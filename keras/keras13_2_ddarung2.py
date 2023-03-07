@@ -9,13 +9,14 @@ import pandas as pd #numpy만큼 많이 쓴다
 
 #1. 데이터
 path = './_data/ddarung/' # . 하나가 현재 폴더
+path_save = './_save/ddarung/'
 
 train_csv = pd.read_csv(path + 'train.csv',
                         index_col=0) #0번째는 index 컬럼이야
 #train_csv = pd.read_csv('./_data/ddarung/train.csv')
 
 print(train_csv)
-print(train_csv.shape) # 1459, 11 > 1459, 10) # index 혹은 id 데이터가 아니다 그냥 번호다 y=ax+b id를 넣고 연산할 필요가 없다
+print(train_csv.shape) # (1459, 10) # index 혹은 id 데이터가 아니다 그냥 번호다 y=ax+b id를 넣고 연산할 필요가 없다
 #pandas는 인덱스와 컬럼명이 따라다닌다 index는 따로 연산하지 않는다
 
 test_csv = pd.read_csv(path + 'test.csv',
@@ -77,25 +78,25 @@ print(y)
 
 
 x_train, x_test, y_train, y_test = train_test_split(
-    x, y, shuffle=True, train_size=0.9, random_state=2000
+    x, y, shuffle=True, train_size=0.8, random_state=2000
 )
  
 print(x_train.shape, x_test.shape) # (1021, 9) (438, 9) > (929, 9) (399, 9)
-print(y_train, y_test.shape) #(1021, ) (438, ) > (929, 399)
+print(y_train.shape, y_test.shape) #(1021, ) (438, ) > (929, 399)
 
 #############################train_csv 데이터에서 x와 y를 분리 #############################
 
 model = Sequential() # keras에서는 Sequential 모델하고 나중에 배울 함수모델이 있다
-model.add(Dense(20, input_dim=9))
-model.add(Dense(50))
-model.add(Dense(70))
-model.add(Dense(30))
-model.add(Dense(10))
+model.add(Dense(32, input_dim=9))
+model.add(Dense(64))
+model.add(Dense(64))
+model.add(Dense(32))
+model.add(Dense(8))
 model.add(Dense(1))
 
 #3. 컴파일, 훈련
 model.compile(loss= 'mse', optimizer='adam')
-model.fit(x_train, y_train, epochs=500, batch_size=6,
+model.fit(x_train, y_train, epochs=100, batch_size=6,
           verbose=1)
 
 
@@ -115,6 +116,11 @@ def RMSE(y_test, y_predict): #재사용 할 때 함수를 쓴다/ RMSE라는 함
 rmse = RMSE(y_test, y_predict) # 정의한 RMSE 사용
 print("RMSE : ", rmse)
 
+#로컬과 평가지표는 다를 것이다
+#일반적인 대회는 50프로만 공개하기 때문에 상대적이다
+
+
+
 ##### submission.csv를 만들어봅시다 #####
 #print(test_csv.isnull().sum())  # 여기도 결측치가 있다
 y_submit = model.predict(test_csv)
@@ -125,4 +131,4 @@ print(submission)
 submission['count'] = y_submit
 print(submission)
 
-submission.to_csv(path + 'submit_0306_0724.csv')
+submission.to_csv(path_save + 'submit_0306_0724.csv')
