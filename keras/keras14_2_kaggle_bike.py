@@ -102,6 +102,11 @@ y_predict = model.predict(x_test)
 r2 = r2_score(y_test, y_predict)
 print('r2 스코어 : ', r2)
 
+def RMSE(y_test, y_predict): #재사용 할 때 함수를 쓴다/ RMSE라는 함수를 정의 할거야
+    return np.sqrt(mean_squared_error(y_test, y_predict)) #sqrt 루트를 씌우는 놈이다
+rmse = RMSE(y_test, y_predict) # 정의한 RMSE 사용
+print("RMSE : ", rmse)
+
 
 y_submit = model.predict(test_csv)
 print(y_submit)

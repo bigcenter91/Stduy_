@@ -77,7 +77,7 @@ print(y_train.shape, y_test.shape) # (7620,) (3266,)
 model = Sequential()
 model.add(Dense(10, input_dim=8, activation='sigmoid'))
 model.add(Dense(30, activation='relu'))
-model.add(Dense(50, activation='relu')) #리니어는 디포트로 되어있는거다 그냥 대각선
+model.add(Dense(50, activation='relu'))
 model.add(Dense(60, activation='relu'))
 model.add(Dense(40, activation='relu'))
 model.add(Dense(20, activation='relu'))
@@ -90,7 +90,7 @@ model.add(Dense(1))
 #3. 컴파일, 훈련
 model.compile(loss='mse', optimizer='adam')
 model.fit(x_train, y_train, epochs=30, batch_size=4,
-          validation_split=0.2, verbose=1)
+          validation_split=0.2, verbose=1) # validation 생각보다 좋아지지 않는 경우가 많다
 
 
 #4. 평가, 예측
@@ -102,4 +102,12 @@ y_predict = model.predict(x_test)
 r2 = r2_score(y_test, y_predict)
 print('r2 스코어 : ', r2)
 
+def RMSE(y_test, y_predict): 
+    return np.sqrt(mean_squared_error(y_test, y_predict))
+rmse = RMSE(y_test, y_predict)
+print("RMSE : ", rmse)
 
+
+#4등분이라 할 수 있다 predict까지/ train, test, val, predict
+#x = train, val, test, predict
+#y = train, val, test
