@@ -8,6 +8,7 @@ import pandas as pd
 
 #1. 데이터
 path = './_data/kaggle_bike/'
+path_save = './_save/kaggle_bike/'
 
 train_csv = pd.read_csv(path + 'train.csv',
                         index_col=0)
@@ -15,6 +16,10 @@ train_csv = pd.read_csv(path + 'train.csv',
 print(train_csv) 
 print(train_csv.shape) # 10886, 11
 
+test_csv = pd.read_csv(path + 'test.csv',
+                        index_col=0)
+print(test_csv)
+print(test_csv.shape) #
 
 ######결측치 처리######
 print(train_csv.isnull().sum())
@@ -39,20 +44,20 @@ print(y_train, y_test.shape)
 ######train_csv 데이터에서 x와 y를 분리
 
 model = Sequential()
-model.add(Dense(10, input_dim=8))
-model.add(Dense(10))
-model.add(Dense(10))
-model.add(Dense(10))
-model.add(Dense(10))
+model.add(Dense(10, activation='sigmoid', input_dim=8))
+model.add(Dense(30, activation='relu'))
+model.add(Dense(50, activation='relu'))
+model.add(Dense(20, activation='relu'))
+model.add(Dense(10, activation='relu'))
 model.add(Dense(1))
 
 #3. 컴파일, 훈련
-model.compile(loss='mse', optimizer='adam')
+model.compile(loss='mae', optimizer='adam')
 es = EarlyStopping(monitor='val_loss', patience=5, mode='min',
                    verbose=1, restore_best_weights=True)
 
-hist = model.fit(x_train, y_train, epochs=20, batch_size=4,
-                 validation_split=0.2, verbose=1, callbacks=[es])
+hist = model.fit(x_train, y_train, epochs=50, batch_size=4,
+                 validation_split=0.3, verbose=1, callbacks=[es])
 
 print("=========발로스=========")
 print(hist.history['val_loss'])
@@ -74,6 +79,18 @@ rmse = RMSE(y_test, y_predict) # 정의한 RMSE 사용
 print("RMSE : ", rmse)
 
 
+
+y_submit = model.predict(test_csv)
+print(y_submit)
+
+submission = pd.read_csv(path + 'samplesubmission.csv', index_col=0)
+print(submission)
+submission['count'] = y_submit
+print(submission)
+
+submission.to_csv(path_save + 'submit_0309_0232.csv')
+
+'''
 import matplotlib.pyplot as plt
 plt.rcParams['font.family'] = 'Malgun Gothic'
 plt.plot(hist.history['loss'], marker='.', c='red', label='로스')
@@ -84,3 +101,4 @@ plt.ylabel('loss, val_loss')
 plt.legend()
 plt.grid()
 plt.show()
+'''

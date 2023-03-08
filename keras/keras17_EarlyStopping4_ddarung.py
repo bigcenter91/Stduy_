@@ -8,6 +8,7 @@ import pandas as pd
 
 #1. 데이터
 path = './_data/ddarung/'
+path_save = './_save/ddarung/'
 
 train_csv = pd.read_csv(path + 'train.csv',
                         index_col=0)
@@ -15,6 +16,11 @@ train_csv = pd.read_csv(path + 'train.csv',
 print(train_csv) 
 print(train_csv.shape) # 1459, 10
 
+test_csv = pd.read_csv(path + 'test.csv',
+                        index_col=0)
+
+print(test_csv)
+print(test_csv.shape) #(715, 9)
 
 ######결측치 처리######
 print(train_csv.isnull().sum())
@@ -39,11 +45,11 @@ print(y_train, y_test.shape)
 ######train_csv 데이터에서 x와 y를 분리
 
 model = Sequential()
-model.add(Dense(10, input_dim=9))
-model.add(Dense(10))
-model.add(Dense(10))
-model.add(Dense(10))
-model.add(Dense(10))
+model.add(Dense(10, activation='relu', input_dim=9))
+model.add(Dense(30, activation='relu'))
+model.add(Dense(50, activation='relu'))
+model.add(Dense(20, activation='relu'))
+model.add(Dense(10, activation='relu'))
 model.add(Dense(1))
 
 #3. 컴파일, 훈련
@@ -72,6 +78,16 @@ def RMSE(y_test, y_predict): #재사용 할 때 함수를 쓴다/ RMSE라는 함
     return np.sqrt(mean_squared_error(y_test, y_predict)) #sqrt 루트를 씌우는 놈이다
 rmse = RMSE(y_test, y_predict) # 정의한 RMSE 사용
 print("RMSE : ", rmse)
+
+y_submit = model.predict(test_csv)
+print(y_submit)
+
+submission = pd.read_csv(path + 'submission.csv', index_col=0)
+print(submission)
+submission['count'] = y_submit
+print(submission)
+
+submission.to_csv(path_save + 'submit_0309_0228.csv')
 
 import matplotlib.pyplot as plt
 plt.rcParams['font.family'] = 'Malgun Gothic'
