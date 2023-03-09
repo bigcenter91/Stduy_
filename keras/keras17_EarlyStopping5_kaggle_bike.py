@@ -19,7 +19,7 @@ print(train_csv.shape) # 10886, 11
 test_csv = pd.read_csv(path + 'test.csv',
                         index_col=0)
 print(test_csv)
-print(test_csv.shape) #
+print(test_csv.shape) # 6493, 8
 
 ######결측치 처리######
 print(train_csv.isnull().sum())
@@ -52,11 +52,11 @@ model.add(Dense(10, activation='relu'))
 model.add(Dense(1))
 
 #3. 컴파일, 훈련
-model.compile(loss='mae', optimizer='adam')
+model.compile(loss='mse', optimizer='adam')
 es = EarlyStopping(monitor='val_loss', patience=5, mode='min',
                    verbose=1, restore_best_weights=True)
 
-hist = model.fit(x_train, y_train, epochs=50, batch_size=4,
+hist = model.fit(x_train, y_train, epochs=100, batch_size=4,
                  validation_split=0.3, verbose=1, callbacks=[es])
 
 print("=========발로스=========")
@@ -88,7 +88,7 @@ print(submission)
 submission['count'] = y_submit
 print(submission)
 
-submission.to_csv(path_save + 'submit_0309_0232.csv')
+submission.to_csv(path_save + 'submit_0309_0930.csv')
 
 '''
 import matplotlib.pyplot as plt
