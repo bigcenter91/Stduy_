@@ -5,6 +5,7 @@ from tensorflow.python.keras.models import Sequential
 from tensorflow.python.keras.layers import Dense
 from sklearn.metrics import accuracy_score
 from sklearn.preprocessing import OneHotEncoder
+import pandas as pd
 
 #1. 데이터
 datasets = load_iris()
@@ -20,9 +21,14 @@ print(y)
 print('y의 라벨값 : ', np.unique(y)) #y의 라벨값 :  [0 1 2]
 
 #################이지점에서 원핫을 해야겠지?#################
-encoder = OneHotEncoder()
-y = encoder.fit_transform(y).toarray()
-print(y.shape)
+y = pd.get_dummies(y)
+print(y)
+
+
+
+# encoder = OneHotEncoder()
+# y = encoder.fit_transform(y).toarray()
+# print(y.shape)
 
 #판다스 겟더미, 사이킷런 원핫인코더
 

@@ -1,6 +1,7 @@
 # 사이킷런 load_wine
 
 import numpy as np
+import pandas as pd
 from sklearn.datasets import load_wine
 from sklearn.model_selection import train_test_split
 from tensorflow.python.keras.models import Sequential
@@ -51,10 +52,15 @@ validation_split=0.2,
 verbose=1,
 )
 
-#4. 평가, 예측
-results = model.evaluate(x_test, y_test)
-print('results : ', results)
+result = model.evaluate(x_test, y_test)
+print(result)
+# print('loss : ', results[0])
+# print('acc : ', results[1])
 
-y_predict = np.round(model.predict(x_test))
-acc = np.round(accuracy_score(y_test, y_predict))
-print('acc : ', acc)
+# #4. 평가, 예측
+# results = model.evaluate(x_test, y_test)
+# print('results : ', results)
+
+# y_predict = np.round(model.predict(x_test))
+# acc = np.round(accuracy_score(y_test, y_predict))
+# print('acc : ', acc)
