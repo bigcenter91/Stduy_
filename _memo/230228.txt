@@ -1,0 +1,14 @@
+MSE 평균제곱오차
+MAE 평균절대오차
+
+
+수치 가지고 판단하면 안된다
+
+evaluete 평가
+
+# 한 라인 삭제 Shift + Delete
+# 취소 Ctrl + Z
+
+batch size 디폴트값 32
+
+행무시, 열우선

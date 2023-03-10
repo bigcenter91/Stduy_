@@ -1,0 +1,16 @@
+클래스와 함수의 차이 메일 보낸다_오늘까지 / ~23:59
+kingkeras@naver.com
+
+
+camel case
+
+
+506
+
+데이터 506
+train 0.8
+val 0.2
+batch 3
+test 0.2
+
+

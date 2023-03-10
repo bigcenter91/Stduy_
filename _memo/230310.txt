@@ -1,0 +1,12 @@
+원핫방식 비교
+
+kaggle_bike
+dacon_diabetes
+ddarung
+
+최대치 올리고 캡쳐본 메일로 보내기 / 매일(금,토,일
+
+standardscaler 일요일에 같이 보내
+MaxAbsScaler
+MinMaxScaler
+RobustScaler 

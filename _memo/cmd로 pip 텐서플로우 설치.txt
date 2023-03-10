@@ -1,0 +1,12 @@
+cmd로 pip 텐서플로우 설치
+
+아나콘다, vscode
+
+python, extention pack, extended
+ 3.9.13 버전 확인
+
+
+
+
+
+www.kaggle.com 개발자들의 놀이터라고 한다
