@@ -21,8 +21,8 @@ x_train, x_test, y_train, y_test = train_test_split(
 model = Sequential()
 model.add(Dense(15, activation='relu', input_dim=10))
 model.add(Dense(20, activation='relu'))
-model.add(Dense(20, activation='relu'))
-model.add(Dense(20, activation='relu'))
+model.add(Dense(10, activation='relu'))
+model.add(Dense(5, activation='relu'))
 model.add(Dense(1))
 
 #3. 컴파일, 훈련

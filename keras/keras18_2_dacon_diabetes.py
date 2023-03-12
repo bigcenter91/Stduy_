@@ -32,26 +32,27 @@ x = train_csv.drop(['Outcome'], axis=1)
 y = train_csv['Outcome']
 
 x_train, x_test, y_train, y_test = train_test_split(
-    x, y, shuffle=True, train_size=0.95, random_state=333
+    x, y, shuffle=True, train_size=0.8, random_state=400
 )
 
 print(x_train.shape, x_test.shape)
 
 model = Sequential()
-model.add(Dense(50, activation='relu', input_dim=8))
-model.add(Dense(100))
-model.add(Dense(500))
-model.add(Dense(200))
+model.add(Dense(10, activation='linear', input_dim=8))
+model.add(Dense(50, activation='relu'))
+model.add(Dense(30, activation='relu'))
+model.add(Dense(100, activation='relu'))
 model.add(Dense(100, activation='relu'))
 model.add(Dense(50, activation='relu'))
+model.add(Dense(30, activation='relu'))
 model.add(Dense(1, activation='sigmoid'))
 
 #컴파일, 훈련
 model.compile(loss = 'binary_crossentropy', optimizer='adam',
               metrics=['acc', 'mse'])
-es = EarlyStopping(monitor='val_loss', patience=10, mode='min',
+es = EarlyStopping(monitor='val_loss', patience=300, mode='min',
                    verbose=1, restore_best_weights=True)
-model.fit(x_train, y_train, epochs=1000, batch_size=3,
+model.fit(x_train, y_train, epochs=5000, batch_size=4,
           validation_split=0.2,
           verbose=1, callbacks=[es]
           )
@@ -77,5 +78,4 @@ print(submission)
 submission['Outcome'] = y_submit
 print(submission)
 
-submission.to_csv(path_save + 'submit_0310_1835.csv')
-
+submission.to_csv(path_save + 'submit_0312_2323.csv')

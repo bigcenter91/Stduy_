@@ -35,7 +35,7 @@ x = train_csv.drop(['casual','registered','count'], axis=1)
 y = train_csv['count']
 
 x_train, x_test, y_train, y_test = train_test_split(
-    x, y, shuffle=True, train_size=0.7, random_state=999
+    x, y, shuffle=True, train_size=0.8, random_state=456
 )
 
 print(x_train.shape, x_test.shape)
@@ -45,19 +45,19 @@ print(y_train, y_test.shape)
 
 model = Sequential()
 model.add(Dense(10, activation='relu', input_dim=8))
-model.add(Dense(30, activation='relu'))
-model.add(Dense(50, activation='relu'))
+model.add(Dense(5, activation='relu'))
 model.add(Dense(20, activation='relu'))
 model.add(Dense(10, activation='relu'))
+model.add(Dense(5, activation='relu'))
 model.add(Dense(1))
 
 #3. 컴파일, 훈련
 model.compile(loss='mse', optimizer='adam')
-es = EarlyStopping(monitor='val_loss', patience=5, mode='min',
+es = EarlyStopping(monitor='val_loss', patience=20, mode='min',
                    verbose=1, restore_best_weights=True)
 
-hist = model.fit(x_train, y_train, epochs=100, batch_size=2,
-                 validation_split=0.3, verbose=1, callbacks=[es])
+hist = model.fit(x_train, y_train, epochs=1000, batch_size=8,
+                 validation_split=0.2, verbose=1, callbacks=[es])
 
 print("=========발로스=========")
 print(hist.history['val_loss'])
@@ -88,7 +88,7 @@ print(submission)
 submission['count'] = y_submit
 print(submission)
 
-submission.to_csv(path_save + 'submit_0310_1854.csv')
+submission.to_csv(path_save + 'submit_0312_2219.csv')
 
 '''
 import matplotlib.pyplot as plt

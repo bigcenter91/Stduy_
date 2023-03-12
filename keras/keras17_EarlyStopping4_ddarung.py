@@ -36,7 +36,7 @@ x = train_csv.drop(['count'], axis=1)
 y = train_csv['count']
 
 x_train, x_test, y_train, y_test = train_test_split(
-    x, y, shuffle=True, train_size=0.95, random_state=999
+    x, y, shuffle=True, train_size=0.7, random_state=333
 )
 
 print(x_train.shape, x_test.shape)
@@ -45,21 +45,22 @@ print(y_train, y_test.shape)
 ######train_csv 데이터에서 x와 y를 분리
 
 model = Sequential()
-model.add(Dense(50, activation='relu', input_dim=9))
-model.add(Dense(100, activation='relu'))
-model.add(Dense(200, activation='relu'))
-model.add(Dense(200, activation='relu'))
-model.add(Dense(60,  activation='relu'))
-model.add(Dense(20,  activation='relu'))
-model.add(Dense(5,  activation='linear'))
+model.add(Dense(50, input_dim=9))
+model.add(Dense(25))
+model.add(Dense(100))
+model.add(Dense(70))
+model.add(Dense(100,  activation='relu'))
+model.add(Dense(50,  activation='relu'))
+model.add(Dense(100,  activation='relu'))
+model.add(Dense(20,  activation='linear'))
 model.add(Dense(1))
 
 #3. 컴파일, 훈련
 model.compile(loss='mse', optimizer='adam')
-es = EarlyStopping(monitor='val_loss', patience=10, mode='min',
+es = EarlyStopping(monitor='val_loss', patience=100, mode='min',
                    verbose=1, restore_best_weights=True)
 
-hist = model.fit(x_train, y_train, epochs=1000, batch_size=1,
+hist = model.fit(x_train, y_train, epochs=1000, batch_size=2,
                  validation_split=0.2, verbose=1, callbacks=[es])
 
 print("=========발로스=========")
@@ -89,7 +90,7 @@ print(submission)
 submission['count'] = y_submit
 print(submission)
 
-submission.to_csv(path_save + 'submit_0310_1940.csv')
+submission.to_csv(path_save + 'submit_0312_2300.csv')
 
 '''
 import matplotlib.pyplot as plt

@@ -67,7 +67,7 @@ y = train_csv ['count']
 print(y)
 
 x_train, x_test, y_train, y_test = train_test_split(
-    x, y, shuffle=True, train_size=0.7, random_state=123)
+    x, y, shuffle=True, train_size=0.8, random_state=234)
 
 print(x_train.shape, x_test.shape) # (7620, 8) (3266, 8)
 print(y_train.shape, y_test.shape) # (7620,) (3266,)
@@ -89,7 +89,7 @@ model.add(Dense(1))
 
 #3. 컴파일, 훈련
 model.compile(loss='mse', optimizer='adam')
-model.fit(x_train, y_train, epochs=30, batch_size=4,
+model.fit(x_train, y_train, epochs=1000, batch_size=4,
           validation_split=0.2, verbose=1) # validation 생각보다 좋아지지 않는 경우가 많다
 
 
@@ -111,3 +111,13 @@ print("RMSE : ", rmse)
 #4등분이라 할 수 있다 predict까지/ train, test, val, predict
 #x = train, val, test, predict
 #y = train, val, test
+
+y_submit = model.predict(test_csv)
+print(y_submit)
+
+submission = pd.read_csv(path + 'samplesubmission.csv', index_col=0)
+print(submission)
+submission['count'] = y_submit
+print(submission)
+
+submission.to_csv(path_save + 'submit_0311_2306.csv')
