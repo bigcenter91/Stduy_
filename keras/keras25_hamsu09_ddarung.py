@@ -1,10 +1,12 @@
 import numpy as np
-from tensorflow.python.keras.models import Sequential
-from tensorflow.python.keras.layers import Dense
+from tensorflow.python.keras.models import Sequential, Model
+from tensorflow.python.keras.layers import Dense, Input
 from tensorflow.python.keras.callbacks import EarlyStopping
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import r2_score, mean_squared_error
 import pandas as pd
+from sklearn.preprocessing import MinMaxScaler, StandardScaler
+from sklearn.preprocessing import MaxAbsScaler, RobustScaler
 
 #1. 데이터
 path = './_data/ddarung/'
@@ -22,45 +24,62 @@ test_csv = pd.read_csv(path + 'test.csv',
 print(test_csv)
 print(test_csv.shape) #(715, 9)
 
-######결측치 처리######
 print(train_csv.isnull().sum())
 train_csv = train_csv.dropna()
 print(train_csv.isnull().sum())
-print(train_csv.shape) # 1328, 10
+print(train_csv.shape)
 
-######train_csv 데이터에서 x와 y를 분리
+
 
 #2. 모델 구성
 print(type(train_csv))
 x = train_csv.drop(['count'], axis=1)
 y = train_csv['count']
 
+
 x_train, x_test, y_train, y_test = train_test_split(
-    x, y, shuffle=True, train_size=0.7, random_state=333
+    x, y, shuffle=True, train_size=0.8, random_state=355
 )
 
-print(x_train.shape, x_test.shape)
-print(y_train, y_test.shape)
+scaler = RobustScaler()
+scaler.fit(x_train) # x_train만큼 범위 잡아라
+x_train = scaler.transform(x_train)
+x_test = scaler.transform(x_test)
+test_csv = scaler.transform(test_csv)
+print(np.min(x_test), np.max(x_test))
 
-######train_csv 데이터에서 x와 y를 분리
+# print(x_train.shape, x_test.shape)
+# print(y_train, y_test.shape)
 
-model = Sequential()
-model.add(Dense(50, input_dim=9))
-model.add(Dense(25))
-model.add(Dense(100))
-model.add(Dense(70))
-model.add(Dense(100,  activation='relu'))
-model.add(Dense(50,  activation='relu'))
-model.add(Dense(100,  activation='relu'))
-model.add(Dense(20,  activation='linear'))
-model.add(Dense(1))
+# model = Sequential()
+# model.add(Dense(50, input_dim=9))
+# model.add(Dense(25))
+# model.add(Dense(100))
+# model.add(Dense(70))
+# model.add(Dense(100,  activation='relu'))
+# model.add(Dense(50,  activation='relu'))
+# model.add(Dense(100,  activation='relu'))
+# model.add(Dense(20,  activation='linear'))
+# model.add(Dense(1))
+
+input1 = Input(shape=(9,))
+dense1 = Dense(50)(input1)
+dense2 = Dense(25)(dense1)
+dense3 = Dense(100)(dense2)
+dense4 = Dense(70)(dense3)
+dense5 = Dense(100, activation='relu')(dense4)
+dense6 = Dense(50, activation='relu')(dense5)
+dense7 = Dense(100, activation='relu')(dense6)
+dense8 = Dense(20, activation='relu')(dense7)
+output1 = Dense(1)(dense8)
+model = Model(inputs=input1, outputs=output1)
 
 #3. 컴파일, 훈련
 model.compile(loss='mse', optimizer='adam')
-es = EarlyStopping(monitor='val_loss', patience=100, mode='min',
+es = EarlyStopping(monitor='val_loss', patience=20, mode='min',
                    verbose=1, restore_best_weights=True)
 
-hist = model.fit(x_train, y_train, epochs=1000, batch_size=2,
+hist = model.fit(x_train, y_train, epochs=1000, batch_size=5,
                  validation_split=0.2, verbose=1, callbacks=[es])
 
 print("=========발로스=========")
@@ -83,7 +102,6 @@ rmse = RMSE(y_test, y_predict) # 정의한 RMSE 사용
 print("RMSE : ", rmse)
 
 
-
 y_submit = model.predict(test_csv)
 print(y_submit)
 
@@ -92,7 +110,7 @@ print(submission)
 submission['count'] = y_submit
 print(submission)
 
-submission.to_csv(path_save + 'submit_0312_2300.csv')
+submission.to_csv(path_save + 'submit_0313_1750_ROB.csv')
 
 '''
 import matplotlib.pyplot as plt

@@ -5,6 +5,8 @@ from tensorflow.python.keras.callbacks import EarlyStopping
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import r2_score, mean_squared_error
 import pandas as pd
+from sklearn.preprocessing import MinMaxScaler, StandardScaler
+from sklearn.preprocessing import MaxAbsScaler, RobustScaler
 
 #1. 데이터
 path = './_data/ddarung/'
@@ -22,27 +24,32 @@ test_csv = pd.read_csv(path + 'test.csv',
 print(test_csv)
 print(test_csv.shape) #(715, 9)
 
-######결측치 처리######
 print(train_csv.isnull().sum())
 train_csv = train_csv.dropna()
 print(train_csv.isnull().sum())
-print(train_csv.shape) # 1328, 10
+print(train_csv.shape)
 
-######train_csv 데이터에서 x와 y를 분리
+
 
 #2. 모델 구성
 print(type(train_csv))
 x = train_csv.drop(['count'], axis=1)
 y = train_csv['count']
 
+
 x_train, x_test, y_train, y_test = train_test_split(
     x, y, shuffle=True, train_size=0.7, random_state=333
 )
 
-print(x_train.shape, x_test.shape)
-print(y_train, y_test.shape)
+scaler = StandardScaler()
+scaler.fit(x_train) # x_train만큼 범위 잡아라
+x_train = scaler.transform(x_train)
+x_test = scaler.transform(x_test)
+test_csv = scaler.transform(test_csv)
+print(np.min(x_test), np.max(x_test))
 
-######train_csv 데이터에서 x와 y를 분리
+# print(x_train.shape, x_test.shape)
+# print(y_train, y_test.shape)
 
 model = Sequential()
 model.add(Dense(50, input_dim=9))
@@ -57,10 +64,10 @@ model.add(Dense(1))
 
 #3. 컴파일, 훈련
 model.compile(loss='mse', optimizer='adam')
-es = EarlyStopping(monitor='val_loss', patience=100, mode='min',
+es = EarlyStopping(monitor='val_loss', patience=50, mode='min',
                    verbose=1, restore_best_weights=True)
 
-hist = model.fit(x_train, y_train, epochs=1000, batch_size=2,
+hist = model.fit(x_train, y_train, epochs=1000, batch_size=3,
                  validation_split=0.2, verbose=1, callbacks=[es])
 
 print("=========발로스=========")
@@ -83,7 +90,6 @@ rmse = RMSE(y_test, y_predict) # 정의한 RMSE 사용
 print("RMSE : ", rmse)
 
 
-
 y_submit = model.predict(test_csv)
 print(y_submit)
 
@@ -92,7 +98,7 @@ print(submission)
 submission['count'] = y_submit
 print(submission)
 
-submission.to_csv(path_save + 'submit_0312_2300.csv')
+submission.to_csv(path_save + 'submit_0313_1220.csv')
 
 '''
 import matplotlib.pyplot as plt

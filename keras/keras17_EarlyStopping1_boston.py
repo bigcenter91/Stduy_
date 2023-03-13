@@ -32,7 +32,8 @@ model.add(Dense(1))
 model.compile(loss='mse', optimizer='adam')
 
 from tensorflow.python.keras.callbacks import EarlyStopping
-es = EarlyStopping(monitor='val_loss', patience=5, mode='min', verbose=1, restore_best_weights=True) # restore_best_weights 디폴트가 false 
+es = EarlyStopping(monitor='val_loss', patience=5, mode='min',
+                   verbose=1, restore_best_weights=True) # restore_best_weights 디폴트가 false 
 
 #loss보다 val_loss가 낫다 / 갱신되면 멈춘다
 #r2가 된다면 최대값을 한다

@@ -1,3 +1,5 @@
+#이미지는 무조건 4차원_가로, 세로, 칼라, 장 수
+
 from sklearn.datasets import load_boston
 from sklearn.model_selection import train_test_split
 from tensorflow.python.keras.models import Sequential
@@ -48,8 +50,14 @@ print(np.min(x_test), np.max(x_test))# fit할 필요가 없다/ x_train의 범�
 
 #2. 모델
 model = Sequential()
-model.add(Dense(1, input_dim=13))
+#model.add(Dense(1, input_dim=13))
+model.add(Dense(1, input_shape=(13,)))
 
+# 데이터가 3차원이면(시계열 데이터)
+#(1000, 100, 1) >> input_shape= 100, 1 / 행빼고
+# 데이터가 4차원이면(이미지 데이터)
+# (60000, 32, 32, 3) >> input_shape=(32, 32, 3) / 제일 앞에가 데이터 갯수이고 행이다 그래서 행 무시, 열 우선
+#앞으론 input_shape로 쓸거다
 
 #3. 컴파일, 훈련
 model.compile(loss='mse', optimizer='adam')

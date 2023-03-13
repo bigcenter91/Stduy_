@@ -4,6 +4,8 @@ from tensorflow.python.keras.layers import Dense
 from sklearn.model_selection import train_test_split
 from tensorflow.python.keras.callbacks import EarlyStopping
 import pandas as pd
+from sklearn.preprocessing import MinMaxScaler, StandardScaler
+from sklearn.preprocessing import MaxAbsScaler, RobustScaler
 
 #1. 데이터
 path = './_data/dacon_diabetes/'
@@ -30,6 +32,12 @@ print(train_csv.shape)
 print(type(train_csv))
 x = train_csv.drop(['Outcome'], axis=1)
 y = train_csv['Outcome']
+
+print(np.min(x), np.max(x)) # x의 최소값 / (0.0 711.0)
+scaler = StandardScaler()
+scaler.fit(x)
+x = scaler.transform(x)
+print(np.min(x), np.max(x))
 
 x_train, x_test, y_train, y_test = train_test_split(
     x, y, shuffle=True, train_size=0.7, random_state=400
@@ -78,4 +86,4 @@ print(submission)
 submission['Outcome'] = y_submit
 print(submission)
 
-submission.to_csv(path_save + 'submit_0312_2323.csv')
+submission.to_csv(path_save + 'submit_0313_1127.csv')

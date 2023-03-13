@@ -1,24 +1,20 @@
-from sklearn.datasets import load_boston
+from sklearn.datasets import load_breast_cancer
 from sklearn.model_selection import train_test_split
-from tensorflow.python.keras.models import Sequential
-from tensorflow.python.keras.layers import Dense
+from tensorflow.python.keras.models import Sequential, Model
+from tensorflow.python.keras.layers import Dense, Input
 import numpy as np
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
 from sklearn.preprocessing import MaxAbsScaler, RobustScaler
-#위 네가지 스케일러 제일 많이 쓴다.
+from sklearn.metrics import r2_score, mean_absolute_error
+from sklearn.metrics import r2_score, accuracy_score
 
-datasets = load_boston()
+
+datasets = load_breast_cancer()
 x = datasets.data
 y = datasets['target']
 
 print(type(x)) # <class 'numpy.ndarray'>
 print(x)
-#연산은 실수에 최적화 되어있다
-#[0,1,2,.......백만] > 0~1로 바꿔준다 이렇게 바꿔주는걸 '정규화' 작업이라한다
-#연산을 시킬려면 numpy를 사용, 부동소수점에 최적화 되어있으니 / normalization
-#y=ax+b 스케일링은 x에만 해당된다
-#성능이 좋아질 수도 있지만 안좋을 수도 있다 아닐 경우 다른 기법을 쓰면 된다 /데이터를 압축, 0~1사이로 만들어주는것
-#최대값으로 나눠버린다
 
 
 print(np.min(x), np.max(x)) # x의 최소값 / (0.0 711.0)
@@ -26,11 +22,6 @@ scaler = MinMaxScaler()
 scaler.fit(x)
 x = scaler.transform(x)
 print(np.min(x), np.max(x)) # (0.0 1.0)
-#훈련데이터만 정규화한다 0~1사이로
-#테스트 데이터 정규화 하는데 훈련데이터를 잡고 훈련데이터의 비율에 맞춰서
-#x_predict 미래를 알고싶은놈
-#ex) 110-0 / 100-0 = 1.1 0은 훈련데이터에서 온 것
-#분리한다음에 스케일링 한다
 
 x_train, x_test, y_train, y_test = train_test_split(
     x, y, train_size=0.8, random_state=123,
@@ -47,14 +38,33 @@ print(np.min(x_test), np.max(x_test))# fit할 필요가 없다/ x_train의 범�
 
 
 #2. 모델
-model = Sequential()
-model.add(Dense(1, input_dim=13))
+# model = Sequential()
+# model.add(Dense(50, input_dim=30))
+# model.add(Dense(100, activation='linear'))
+# model.add(Dense(40, activation='linear'))
+# model.add(Dense(20, activation='linear'))
+# model.add(Dense(1, activation='sigmoid'))
+
+input1 = Input(shape=(30, ))
+dense1 = Dense(50)(input1)
+dense2 = Dense(100, activation='linear')(dense1)
+dense3 = Dense(40, activation='linear')(dense2)
+dense4 = Dense(20, activation='linear')(dense3)
+output1 = Dense(1, activation='sigmoid')(dense4)
+model = Model(inputs=input1, outputs=output1)
+
+
 
 
 #3. 컴파일, 훈련
 model.compile(loss='mse', optimizer='adam')
-model.fit(x_train, y_train, epochs=10)
+model.fit(x_train, y_train, epochs=50)
 
 #4. 평가, 예측
-loss = model.evaluate(x_test, y_test)
-print("loss : ", loss )
+results = model.evaluate(x_test, y_test)
+print('results : ', results)
+
+y_predict = np.round(model.predict(x_test))
+
+acc = accuracy_score(y_test, y_predict)
+print('acc : ', acc)
