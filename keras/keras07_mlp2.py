@@ -16,7 +16,7 @@ y = np.array([11, 12, 13, 14, 15, 16, 17, 18, 19, 20])
 
 # x = x.transpose() #행열 바꾸는 함수_transpose
 x = x.T #전치행렬 가로와 세로를 바꾼다
-
+print(x)
 print(x.shape)  # (2, 10) > 10개의 특성을 가진 2개의 데이터 / 최소단위부터 센다
 print(y.shape)  # (2, ) 2개의 피쳐?
 

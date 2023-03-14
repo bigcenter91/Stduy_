@@ -1,5 +1,3 @@
-#이미지는 무조건 4차원_가로, 세로, 칼라, 장 수
-
 from sklearn.datasets import load_boston
 from sklearn.model_selection import train_test_split
 from tensorflow.python.keras.models import Sequential, Model
@@ -34,47 +32,47 @@ x_train, x_test, y_train, y_test = train_test_split(
 #scaler = MinMaxScaler()
 #scaler = StandardScaler() # MinMaxScaler, StandardScaler 둘 중 하나 / 하나로 모아줘야하면 스탠다드, 그 반대는 민맥스
 scaler = MaxAbsScaler()
-scaler.fit(x_train)
-x_train = scaler.transform(x_train)
+
+# scaler.fit(x_train)
+# x_train = scaler.transform(x_train)
+
+x_train = scaler.fit_transform(x_train) # 위에 두줄과 같은 한줄이다
 x_test = scaler.transform(x_test) 
 print(np.min(x_test), np.max(x_test))
 
 
 #2. 모델
-model = Sequential()
-model.add(Dense(30, input_shape=(13,), name='S1'))
-model.add(Dense(20, name='S2'))
-model.add(Dense(10, name='S3'))
-model.add(Dense(1, name='S4'))
-model.summary()
 
-
-
-input1 = Input(shape=(13,), name='h1')
-dense1 = Dense(30, name='h2')(input1)
-dense2 = Dense(20, name='h3')(dense1)
-dense3 = Dense(10, name='h4')(dense2)
-output1 = Dense(1, name='h5')(dense3)
+input1 = Input(shape=(13,))
+dense1 = Dense(30)(input1)
+dense2 = Dense(20)(dense1)
+dense3 = Dense(10)(dense2)
+output1 = Dense(1)(dense3)
 model = Model(inputs=input1, outputs=output1)
-model.summary()
-#모델을 구성을 한다음에 정의가 가장 밑에 한다/ input 레이어도 명시를 해준다
-#어디에서 어디까지야라고 명시를 해준다
 
-#시퀀셜 모델은 상단에서하고 함수형 모델에서는 마지막에 한다
-#모델의 정의를 상단에서 하느냐 하단에서 하느냐
+# model.save('./_save/keras26_1_save_model.h5') #모델파일 *.h5
 
-# 데이터가 3차원이면(시계열 데이터)
-#(1000, 100, 1) >> input_shape= 100, 1 / 행빼고
-# 데이터가 4차원이면(이미지 데이터)
-# (60000, 32, 32, 3) >> input_shape=(32, 32, 3) / 제일 앞에가 데이터 갯수이고 행이다 그래서 행 무시, 열 우선
-#앞으론 input_shape로 쓸거다
 
-'''
 #3. 컴파일, 훈련
 model.compile(loss='mse', optimizer='adam')
-model.fit(x_train, y_train, epochs=10)
+
+from tensorflow.python.keras.callbacks import EarlyStopping, ModelCheckpoint
+es = EarlyStopping(monitor='val_loss', patience=10, mode='min',
+                   verbose=1, restore_best_weights=True)
+mcp = ModelCheckpoint(monitor='val_loss', mode='auto',
+            verbose=1,
+            save_best_only=True, #가장 좋은 지점에서 적용 시켜라
+            filepath='./_save/MCP/keras27_ModelCheckPoint.hdf5' #거의 동일한 가중치가 적용된다
+)
+
+model.fit(x_train, y_train, epochs=1000, 
+          callbacks=[es, mcp],
+          validation_split=0.2) # 두개 이상은 리스트, 훈련시키는게 쟤말고 많이 있어서
+
+#val_loss improved from 29.55315 to 29.27658, saving model to ./_save/MCP\keras27_ModelCheckPoint.hdf5
+#개선 됐으니까 save 되겠지? / 10번째 개선이 없을 때 Early Stopping 걸린다
+
 
 #4. 평가, 예측
 loss = model.evaluate(x_test, y_test)
 print("loss : ", loss )
-'''

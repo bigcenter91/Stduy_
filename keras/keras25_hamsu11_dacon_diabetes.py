@@ -66,6 +66,7 @@ model.fit(x_train, y_train, epochs=5000, batch_size=4,
           verbose=1, callbacks=[es]
           )
 
+
 #4. 평가, 예측
 results = model.evaluate(x_test, y_test)
 print('results : ', results)
@@ -77,14 +78,12 @@ acc = accuracy_score(y_test, y_predict)
 print('acc : ', acc)
 
 
+# y_submit = np.round(model.predict(test_csv))
+# print(y_submit)
 
+# submission = pd.read_csv(path + 'sample_submission.csv', index_col=0)
+# print(submission)
+# submission['Outcome'] = y_submit
+# print(submission)
 
-y_submit = np.round(model.predict(test_csv))
-print(y_submit)
-
-submission = pd.read_csv(path + 'sample_submission.csv', index_col=0)
-print(submission)
-submission['Outcome'] = y_submit
-print(submission)
-
-submission.to_csv(path_save + 'submit_0313_1127.csv')
+# submission.to_csv(path_save + 'submit_0313_1127.csv')
