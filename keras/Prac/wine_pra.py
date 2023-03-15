@@ -24,7 +24,3 @@ print(test_csv) # 1000, 12
 
 print(type(train_csv)) # 데이터 타입을 알 수 있다
 
-0부터 시작하는건 to_categorical
-get_dumi는 바로 바뀐다
-
-원핫은 변환해줘야한다
