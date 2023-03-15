@@ -1,0 +1,5 @@
+cnn 복잡한
+조각조각 짤라서 연산
+
+pytorch org
+keras io

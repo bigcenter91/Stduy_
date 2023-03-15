@@ -4,10 +4,10 @@ from sklearn.model_selection import train_test_split
 from tensorflow.python.keras.callbacks import EarlyStopping
 import pandas as pd
 import numpy as np
-from sklearn.preprocessing import MinMaxScaler, StandardScaler
+from sklearn.preprocessing import LabelEncoder, MinMaxScaler, StandardScaler
 from sklearn.preprocessing import MaxAbsScaler, RobustScaler
 from sklearn.metrics import accuracy_score
-from tensorflow.keras.utils import to_categorical
+from keras.utils import to_categorical
 
 
 #1. 데이터
@@ -26,9 +26,29 @@ print(test_csv) # 1000, 12
 
 print(type(train_csv))
 
-x = train_csv.drop(['quality', 'type'], axis=1)
+train_csv = train_csv[~np.any(train_csv==3, axis=1)]
+train_csv = train_csv[~np.any(train_csv==4, axis=1)]
+train_csv = train_csv[~np.any(train_csv==8, axis=1)]
+train_csv = train_csv[~np.any(train_csv==9, axis=1)]
+
+print(np.unique(train_csv['quality']))
+
+# train_csv = train_csv.drop(train_csv[train_csv['quality'].isin([3, 4, 8, 9])].index)
+# print(train_csv)
+# print(train_csv.shape)
+
+le = LabelEncoder()
+le.fit(train_csv['type'])
+aaa = le.transform(train_csv['type'])
+train_csv['type'] = aaa
+
+test_csv['type'] = le.transform(test_csv['type'])
+print(le.transform(['red', 'white']))
+
+
+x = train_csv.drop(['quality'], axis=1)
 y = train_csv['quality']
-test_csv = test_csv.drop('type', axis=1)
+
 
 
 print(x.shape, y.shape) # (5497, 11), (5497, )
@@ -39,9 +59,19 @@ print(y)
 print('y의 라벨값 : ', np.unique(y)) # [3 4 5 6 7 8 9]
 
 
-y = to_categorical(y)
-print(y.shape) # 5497, 10
-y = y[:, 3:]
+y = pd.get_dummies(y)
+y = np.array(y)
+# y = to_categorical(y)
+#y = np.delete(y, [0, 1, 5, 6], axis=1)
+print(y)
+print('y의 라벨값 : ', np.unique(y))
+print(y.shape) # 5497, 10 > 5128, 8
+
+print(x.shape, y.shape)
+
+#y = y[:, 3:]
+
+print(x.shape, y.shape)
 
 # 하지만, 이 방법은 모든 라벨 값이 순서대로 0, 1, 2, 3, ... 으로 
 # 지정된 경우에만 제대로 작동합니다. 즉, 이 방법은 라벨 값의 범위가 
@@ -53,7 +83,7 @@ y = y[:, 3:]
 
 
 print(y)
-print(y.shape)
+print(y.shape) #(5497, 7) > 5128, 4
 
 print(np.min(x), np.max(x))
 
@@ -73,16 +103,16 @@ print(x_train.shape, x_test.shape)
 
 #2. 모델 구성
 
-input1 = Input(shape=(11, ))
-dense1 = Dense(50, activation='relu')(input1)
+input1 = Input(shape=(12, ))
+dense1 = Dense(100, activation='relu')(input1)
 drop1 = Dropout(0.3)(dense1)
-dense2 = Dense(100, activation='relu')(drop1)
+dense2 = Dense(60, activation='relu')(drop1)
 drop2 = Dropout(0.3)(dense2)
-dense3 = Dense(40, activation='relu')(drop2)
+dense3 = Dense(100, activation='relu')(drop2)
 drop3 = Dropout(0.3)(dense3)
-dense4 = Dense(50, activation='relu')(drop3)
+dense4 = Dense(30, activation='relu')(drop3)
 drop4 = Dropout(0.3)(dense4)
-output1 = Dense(7, activation='softmax')(drop4)
+output1 = Dense(3, activation='softmax')(drop4)
 model = Model(inputs=input1, outputs=output1)
 
 
@@ -90,10 +120,10 @@ model = Model(inputs=input1, outputs=output1)
 model.compile(loss = 'categorical_crossentropy', optimizer='adam',
               metrics=['acc'])
 
-es = EarlyStopping(monitor='val_loss', patience=500, mode='min',
+es = EarlyStopping(monitor='val_loss', patience=100, mode='min',
                    verbose=1, restore_best_weights=True)
 
-model.fit(x_train, y_train, epochs=1000, batch_size=5,
+model.fit(x_train, y_train, epochs=1000, batch_size=6,
           validation_split=0.2,
           verbose=1, callbacks=[es])
 
@@ -116,9 +146,9 @@ submission = pd.read_csv(path + 'sample_submission.csv', index_col=0)
 y_submit = model.predict(test_csv)
 
 y_submit = np.argmax(y_submit, axis=1)
-y_submit+=3 # 라벨 값하고 맞춰줄려고
+y_submit+=5 # 라벨 값하고 맞춰줄려고
 #print(y_submit)
-
+print(y_submit)
 submission['quality'] = y_submit
 
-submission.to_csv(path_save + 'submit_0314_1758.csv')
+submission.to_csv(path_save + 'submit_0315_1259_wine.csv')
