@@ -4,10 +4,14 @@ from sklearn.model_selection import train_test_split
 from tensorflow.python.keras.callbacks import EarlyStopping
 import pandas as pd
 import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
 from sklearn.preprocessing import MaxAbsScaler, RobustScaler
 from sklearn.metrics import accuracy_score
 from tensorflow.keras.utils import to_categorical
+import matplotlib.font_manager as fm
+
 
 
 #1. 데이터
@@ -24,9 +28,14 @@ test_csv = pd.read_csv(path + 'test.csv',
 
 print(test_csv) # 12943, 12
 
+train_csv.info()
+
+train_csv.describe()
+
 # print(train_csv.isnull().sum())
 # print(train_csv.info())
 # train_csv = train_csv.dropna()
+
 
 print(type(train_csv)) # <class 'pandas.core.frame.DataFrame'>
 
@@ -58,7 +67,7 @@ print('y의 라벨값 : ', np.unique(y)) # [0 1]
 
 
 print(y)
-print(y.shape)
+print(x.shape, y.shape)
 
 print(np.min(x), np.max(x))
 
@@ -92,7 +101,7 @@ model = Model(inputs=input1, outputs=output1)
 
 
 #3. 컴파일, 훈련
-model.compile(loss = 'categorical_crossentropy', optimizer='adam',
+model.compile(loss = 'binary_crossentropy', optimizer='adam',
               metrics=['acc'])
 
 es = EarlyStopping(monitor='val_loss', patience=20, mode='min',
@@ -107,21 +116,23 @@ model.fit(x_train, y_train, epochs=1000, batch_size=128,
 result = model.evaluate(x_test, y_test)
 print('results : ' , result)
 
-y_predict = np.round(model.y_predict(x_test))
+y_predict = np.round(model.predict(x_test))
 
 acc = accuracy_score(y_test, y_predict)
 print('acc : ', acc)
 
 
 
-# #내보내기
-# submission = pd.read_csv(path + 'sample_submission.csv', index_col=0)
-# y_submit = model.predict(test_csv)
+#내보내기
+submission = pd.read_csv(path + 'sample_submission.csv', index_col=0)
+y_submit = model.predict(test_csv)
 
-# y_submit = np.argmax(y_submit, axis=1)
+y_submit = np.argmax(y_submit)
+
+
 # y_submit+=3 # 라벨 값하고 맞춰줄려고
-# #print(y_submit)
+print(y_submit)
 
-# submission['quality'] = y_submit
+submission['전화해지여부'] = y_submit
 
-# submission.to_csv(path_save + 'submit_0314_1758.csv')
+submission.to_csv(path_save + 'submit_0316_1940.csv')
