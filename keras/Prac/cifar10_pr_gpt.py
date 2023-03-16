@@ -77,3 +77,9 @@ print('acc : ', acc)
 import matplotlib.pyplot as plt
 plt.plot(hist.history['val_loss'], label='val_acc')
 plt.show()
+
+
+# training time :  2460.45
+# 313/313 [==============================] - 6s 18ms/step - loss: 0.5861 - accuracy: 0.8063
+# result :  [0.5861232280731201, 0.8062999844551086]
+# acc :  0.8063
