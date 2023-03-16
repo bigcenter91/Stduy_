@@ -2,16 +2,17 @@ import numpy as np
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense
 
-#1. 데이터
 
+#1. 데이터
 
 x = np.array([range(10), range(21,31), range(201, 211)]) 
 
+print(x.shape) # (3, 10)
 x = x.T
-print(x.shape) #(3, 10)
-
 #print(x)  #0 1 2 3 4 5 6 7 8 9 컴퓨터 시작 숫자는 '0' 0부터 10-1로 생각하면 된다
+# x : range(n)= 0~n-1까지 : 시작숫자 0부터, 끝은 n-1 
 
+print(x)
 '''
 [[  0  21 201]
  [  1  22 202]
@@ -25,13 +26,14 @@ print(x.shape) #(3, 10)
  [  9  30 210]]
 '''
 
-y = np.array([[1,2,3,4,5,6,7,8,9,10]])  # (1, 10)
+y = np.array([[1,2,3,4,5,6,7,8,9,10]])
+print(y.shape) #(1, 10)
 y = y.T # (10, 1)
 
 print(y.shape)
 
 model = Sequential()
-model.add(Dense(4, input_dim=3))
+model.add(Dense(4, input_dim=3)) # 열의 갯수로 한다_input_dim=3
 model.add(Dense(5))
 model.add(Dense(6))
 model.add(Dense(4))

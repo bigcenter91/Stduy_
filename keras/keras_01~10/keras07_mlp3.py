@@ -12,8 +12,17 @@ x = np.array(
     [9,8,7,6,5,4,3,2,1,0]]
 )
 y = np.array([11, 12, 13, 14, 15, 16, 17, 18, 19, 20])
+
+x = x.transpose()
+
+print(x.shape) # (3, 10) > 10, 3
+print(y.shape) # (10,)
+
+
+# [실습] 예측 [[10, 1.4, 0]] 결과[20]
+
 # w1x1 + w2x2 + w3x3 + b
-x = x.T
+
 
 model = Sequential()
 model.add(Dense(4, input_dim=3))

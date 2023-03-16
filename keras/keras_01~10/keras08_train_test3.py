@@ -13,7 +13,7 @@ from sklearn.model_selection import train_test_split
 
 x_train, x_test, y_train, y_test = train_test_split(
 x, y, 
-train_size=0.6,
+train_size=0.7,
 test_size=0.3, # 둘 중 하나만 써도 된다
 random_state=1234, 
 shuffle=True,
@@ -21,8 +21,11 @@ shuffle=True,
 #데이터 값이 좋아야한다
 )
 
-print(x_train)
-print(x_test)
+print(x_train) # [2 1 9 5 6 7 4]
+print(x_test) # [ 8  3 10]
+print(y_train) # [2 1 9 5 6 7 4]
+print(y_test) # [ 8  3 10]
+
 
 #2. 모델구성
 model = Sequential()
@@ -35,6 +38,7 @@ model.fit(x_train, y_train, epochs=100, batch_size=1)
 #4. 평가, 예측
 loss = model.evaluate(x_test, y_test)
 print('loss : ', loss)
+
 result = model.predict([11])
 print("11의 예측 값 : ",result)
 

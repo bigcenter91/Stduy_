@@ -20,6 +20,9 @@ y = np.array([[1,2,3,4,5,6,7,8,9,10],
               
 y = y.T # (10, 3)
 
+#실습 예측 [[9, 30, 210]] -> 예상 y값 [[10, 1.9, 0]]
+
+#2. 모델 구성
 model = Sequential()
 model.add(Dense(4, input_dim=3))
 model.add(Dense(5))

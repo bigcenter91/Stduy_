@@ -18,3 +18,14 @@ model.add(Dense(1))
 # 3. 컴파일, 훈련
 model.compile(loss='mse', optimizer='adam')
 model.fit(x, y, epochs=500, batch_size=3)
+
+#4. 평가, 예측
+loss = model.evaluate(x, y)
+print('loss : ', loss)
+
+
+result = model.predict([6])
+print("[6]의 예측값 : ",result)
+
+#batch 얼마나 묶어서 훈련하느냐 많아지면 좋아질 수 있으나
+#느리고 오래걸린다 디폴트 : 32

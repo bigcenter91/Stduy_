@@ -28,9 +28,12 @@ model.fit(x_train, y_train, epochs=100, batch_size=1)
 loss = model.evaluate(x_test, y_test)
 print("loss : ", loss)
 
-y_predict = model.predict(x) #y=wxb인데 w가 곱해지겠지 / 두 차이를 보기 위해서
-# 시각화를 한다고 표현
+y_predict = model.predict(x) 
+#y=wxb인데 w가 곱해지겠지 / 두 차이를 보기 위해서
+
+# 시각화를 한다고 표현 = 그래프?
 import matplotlib.pyplot as plt
+
 plt.scatter(x, y )
 #plt.scatter(x, y_predict)
 plt.plot(x, y_predict, color='red')

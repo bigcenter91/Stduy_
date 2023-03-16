@@ -21,11 +21,16 @@ x = np.array(
 
 y = np.array([11, 12, 13, 14, 15, 16, 17, 18, 19, 20])
 
-print(x.shape)  # (10, 2) > 2개의 특성을 가진 10개의 데이터 / 최소단위부터 센다
-print(y.shape)  # (10, )
+print(x.shape)  # (10, 2) > 2개의 특성을 가진 10개의 데이터 / 
+                # 최소단위부터 센다_2개의 특성을 가진 10개의 데이터
+print(y.shape)  # (10, ) 10 스칼라
+
+# 행: 데이터 갯수
+# 열: 특성, 컬럼, 피쳐
+#열을 보고 모델 갯수 파악
 
 model = Sequential()
-model.add(Dense(3, input_dim=2)) # 열이 두개라서 '2' (차원)
+model.add(Dense(3, input_dim=2)) # 열이 두개라서 '2' (차원) / 노드 2개로 시작
 model.add(Dense(5))
 model.add(Dense(4))
 model.add(Dense(1))

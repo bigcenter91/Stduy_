@@ -7,6 +7,10 @@ from tensorflow.keras.layers import Dense
 x = np.array([1,2,3,4,5])
 y = np.array([1,2,3,5,4])
 
+#array 배열
+
+print(x.shape)
+
 model = Sequential()
 model.add(Dense(4, input_dim=1))
 model.add(Dense(6))
