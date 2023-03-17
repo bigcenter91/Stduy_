@@ -27,6 +27,7 @@ y_test = to_categorical(y_test)
 y_train = to_categorical(y_train)
 print(y_test.shape)
 
+
 #2. 모델 구성
 model = Sequential()
 model.add(Conv2D(32, kernel_size=(3,3), activation='relu', padding='same', input_shape=(32, 32, 3)))

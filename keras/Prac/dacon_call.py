@@ -122,7 +122,6 @@ acc = accuracy_score(y_test, y_predict)
 print('acc : ', acc)
 
 
-
 #내보내기
 submission = pd.read_csv(path + 'sample_submission.csv', index_col=0)
 y_submit = model.predict(test_csv)
