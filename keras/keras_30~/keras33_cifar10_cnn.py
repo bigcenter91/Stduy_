@@ -5,7 +5,7 @@ import numpy as np
 from tensorflow.python.keras.callbacks import EarlyStopping
 from sklearn.metrics import r2_score, accuracy_score
 from sklearn.preprocessing import MinMaxScaler
-from keras.utils import to_categorical
+from tensorflow.keras.utils import to_categorical
 
 #1. 데이터
 (x_train, y_train), (x_test, y_test) = cifar10.load_data()

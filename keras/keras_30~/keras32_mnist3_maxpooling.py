@@ -5,13 +5,15 @@ import numpy as np
 from tensorflow.python.keras.callbacks import EarlyStopping
 from sklearn.metrics import r2_score, accuracy_score
 from sklearn.preprocessing import MinMaxScaler
-from keras.utils import to_categorical
+from tensorflow.keras.utils import to_categorical
 
 #1. 데이터
 (x_train, y_train), (x_test, y_test) = mnist.load_data()
 
 
 ####### 실습 ####### 맹그러봐
+
+print(x_train.shape)
 
 x_train = x_train.reshape(60000, 28, 28, 1) # (60000, 28, 14, 2)도 가능하다 곱하거나 나눠야한다 그렇게해서 원값이 나와야한다
                                             # shape와 크기는 같아야한다 
@@ -48,21 +50,25 @@ print(np.unique(y_train, return_counts=True))
 
 #3. 컴파일, 훈련
 model.compile(loss='categorical_crossentropy', optimizer='adam', metrics='acc')
-es = EarlyStopping(monitor='val_loss', patience=50, mode='min',
-                    verbose=1, restore_best_weights=True)
+# es = EarlyStopping(monitor='val_loss', patience=50, mode='min',
+#                     verbose=1, restore_best_weights=True)
 
-hist = model.fit(x_train, y_train, epochs=200, batch_size=1000,
-                 validation_split=0.2, verbose=1, callbacks=[es])
+model.fit(x_train, y_train, epochs=30, batch_size=128,)
 
 #4. 평가, 예측
 result = model.evaluate(x_test, y_test)
-print('result : ', result)
+print('loss :', result[0])
+print('acc :', result[1])
 
-y_predict = model.predict(x_test)
+# #4. 평가, 예측
+# result = model.evaluate(x_test, y_test)
+# print('result : ', result)
 
-acc = accuracy_score(np.argmax(y_test, axis=1), np.argmax(y_predict, axis=1))
-print('acc : ', acc)
+# y_predict = model.predict(x_test)
 
-import matplotlib.pyplot as plt
-plt.plot(hist.history['val_loss'], label='val_acc')
-plt.show()
+# acc = accuracy_score(np.argmax(y_test, axis=1), np.argmax(y_predict, axis=1))
+# print('acc : ', acc)
+
+# import matplotlib.pyplot as plt
+# plt.plot(hist.history['val_loss'], label='val_acc')
+# plt.show()

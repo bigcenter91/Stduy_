@@ -14,8 +14,6 @@ from tensorflow.keras.utils import to_categorical
 print(x_train.shape, y_train.shape) # (50000, 32, 32, 3) (50000, 1)
 print(x_test.shape, y_test.shape) # (10000, 32, 32, 3) (10000, 1)
 
-print(x_train)
-
 scaler = MinMaxScaler() # Minmax : 최대값 - 최소값을 0과 1로 표현
 x_train = x_train/255.
 x_test = x_test/255. # .은 python의 부동소수를 보여주기 위해
@@ -52,15 +50,15 @@ model.summary() # 요약하여 출력
 
 #3. 컴파일, 훈련
 
-model.compile(loss = 'categorical_crossentropy', optimizer='adam', metrics='acc')
+model.compile(loss = 'categorical_crossentropy', optimizer='Adagrad', metrics='acc')
 
-es = EarlyStopping(monitor='val_loss', patience=10, mode='max',
+es = EarlyStopping(monitor='val_loss', patience=30, mode='max',
                    verbose=1, restore_best_weights=True)
 
 import time
 start_time = time.time()
 
-hist = model.fit(x_train, y_train, epochs=50, batch_size=2000,
+hist = model.fit(x_train, y_train, epochs=100, batch_size=2000,
                  validation_split=0.2, verbose=1, callbacks=[es])
 
 end_time = time.time()
@@ -77,6 +75,5 @@ acc = accuracy_score(np.argmax(y_test, axis=1), np.argmax(y_predict, axis=1))
 print('acc : ', acc)
 
 import matplotlib.pyplot as plt
-# plt.plot(hist.history['val_loss'], label='val_acc')
-plt.imshow(x_train[111])
+plt.plot(hist.history['val_loss'], label='val_acc')
 plt.show()

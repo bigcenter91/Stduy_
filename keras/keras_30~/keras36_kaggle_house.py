@@ -26,12 +26,13 @@ print(train_csv.isnull().sum())
 print(train_csv.shape) # (1460, 80)
 
 
-# 1.4 라벨인코딩( object 에서 )
+# 1.4 라벨인코딩
 le=LabelEncoder()
 for i in train_csv.columns:
     if train_csv[i].dtype=='object':
         train_csv[i] = le.fit_transform(train_csv[i])
         test_csv[i] = le.fit_transform(test_csv[i])
+        
 print(len(train_csv.columns))
 print(train_csv.info())
 train_csv=train_csv.dropna()
@@ -46,7 +47,7 @@ print(x.shape) # (1121, 79)
 
 # 1.6 train, test 분리
 x_train, x_test, y_train, y_test = train_test_split(
-    x, y, train_size=0.7, random_state=123, shuffle=True)
+    x, y, train_size=0.8, random_state=555, shuffle=True)
 
 #1.7 스케일링
 scaler = MinMaxScaler()
@@ -64,21 +65,24 @@ test_csv = scaler.transform(test_csv)
 # model.add(Dense(1))
 
 input1 = Input(shape=(79,))
-dense1 = Dense(50)(input1)
-drop1 = Dropout(0.2)(dense1)
-dense2 = Dense(100, activation='relu')(drop1)
-dense3 = Dense(100)(dense2)
-dense4 = Dense(50)(dense3)
-dense5 = Dense(10)(dense4)
+dense1 = Dense(100, activation='relu')(input1)
+drop1 = Dropout(0.3)(dense1)
+dense2 = Dense(50, activation='relu')(drop1)
+drop2 = Dropout(0.3)(dense2)
+dense3 = Dense(100, activation='relu')(drop2)
+drop3 = Dropout(0.3)(dense3)
+dense4 = Dense(50, activation='relu')(drop3)
+drop4 = Dropout(0.3)(dense4)
+dense5 = Dense(20, activation='relu')(drop4)
 output1 = Dense(1)(dense5)
 model = Model(inputs=input1, outputs=output1)
 
 # 3. 컴파일, 훈련
-model.compile(loss='mse', optimizer='adam', metrics=['acc'])
+model.compile(loss='mae', optimizer='adam', metrics=['acc'])
 es = EarlyStopping(monitor='val_loss', patience=200, verbose=1, 
                    mode='min', restore_best_weights=True)
 
-hist = model.fit(x_train, y_train, epochs=2000, batch_size=40, verbose=1, 
+hist = model.fit(x_train, y_train, epochs=2000, batch_size=10, verbose=1, 
                  validation_split=0.2, callbacks=[es])
 
 # 4. 평가, 예측
@@ -93,7 +97,7 @@ print('r2 : ', r2)
 # 4.1 내보내기
 import datetime
 date = datetime.datetime.now()
-date = date.strftime('%m%d_%H%M%S')
+date = date.strftime('%m%d_%H%M')
 
 y_submit = model.predict(test_csv)
 

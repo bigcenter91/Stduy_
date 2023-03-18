@@ -1,7 +1,8 @@
 from tensorflow.keras.datasets import mnist
-from tensorflow.python.keras.models import Sequential
-from tensorflow.python.keras.layers import Dense, Conv2D, Flatten
+from tensorflow.python.keras.models import Sequential, Model
+from tensorflow.python.keras.layers import Dense, Conv2D, Flatten, Input
 import numpy as np
+import tensorflow as tf
 from tensorflow.python.keras.callbacks import EarlyStopping
 from sklearn.metrics import r2_score, accuracy_score
 from sklearn.preprocessing import MinMaxScaler
@@ -46,24 +47,46 @@ x_test = x_test.reshape(10000, 28, 28, 1)
 
 
 #2. 모델 구성
-model = Sequential()
+# model = Sequential()
 
-model.add(Conv2D(7, (2,2), 
-                 padding='same',
-                 input_shape=(28,28,1))) # 출력 : (N, 7, 7, 7) 
+# model.add(Conv2D(7, (2,2), 
+#                  padding='same',
+#                  input_shape=(28,28,1))) # 출력 : (N, 7, 7, 7) 
                                 
-model.add(Conv2D(filters=4, 
-                 padding='same',
-                 kernel_size=(3,3),
-                 activation='relu')) 
+# model.add(Conv2D(filters=4, 
+#                  padding='same',
+#                  kernel_size=(3,3),
+#                  activation='relu')) 
 
-model.add(Conv2D(10, (2,2))) 
+# model.add(Conv2D(10, (2,2))) 
                             
-model.add(Flatten())         
-model.add(Dense(32, activation='relu'))
-model.add(Dense(10, activation='relu'))      
-model.add(Dense(10, activation='softmax'))
+# model.add(Flatten())         
+# model.add(Dense(32, activation='relu'))
+# model.add(Dense(10, activation='relu'))      
+# model.add(Dense(10, activation='softmax'))
+# model.summary()
+
+
+input1 = Input(shape=(28, 28, 1))
+
+conv1 = Conv2D(7, (2,2), padding='same')(input1)
+conv2 = Conv2D(filters=4,
+                               padding='same',
+                               kernel_size=(3,3),
+                               activation='relu')(conv1)
+
+conv3 = Conv2D(10, (2,2))(conv2)
+
+
+flatten = Flatten()(conv3)
+dense1 = Dense(32, activation='relu')(flatten)
+dense2 = Dense(10, activation='relu')(dense1)
+
+output1 = Dense(10, activation='softmax')(dense2)
+model = Model(inputs=input1, outputs=output1)
+
 model.summary()
+
 
 
 print(np.unique(y_train, return_counts=True))

@@ -5,7 +5,7 @@ import numpy as np
 from tensorflow.python.keras.callbacks import EarlyStopping
 from sklearn.metrics import r2_score, accuracy_score
 from sklearn.preprocessing import MinMaxScaler
-from keras.utils import to_categorical
+from tensorflow.keras.utils import to_categorical
 
 #1. 데이터
 (x_train, y_train), (x_test, y_test) = cifar100.load_data()
@@ -24,7 +24,7 @@ print(np.unique(y_train, return_counts=True))
 print(y_test.shape) # (10000, 1)
 print(y_train.shape) # (50000, 1)
 
-y_test = to_categorical(y_test)
+ry_test = to_categorical(y_test)
 y_train = to_categorical(y_train)
 print(y_test.shape) # (10000, 10) / 이진 벡터로 변환
 
@@ -53,7 +53,7 @@ model.summary() # 요약하여 출력
 
 #3. 컴파일, 훈련
 
-model.compile(loss = 'categorical_crossentropy', optimizer='Adagrad', metrics='acc')
+model.compile(loss = 'categorical_crossentropy', optimizer='adam', metrics='acc')
 
 es = EarlyStopping(monitor='val_loss', patience=30, mode='min',
                    verbose=1, restore_best_weights=True)
@@ -79,5 +79,5 @@ print('acc : ', acc)
 
 import matplotlib.pyplot as plt
 # plt.plot(hist.history['val_loss'], label='val_acc')
-plt.imshow(x_train[222])
+plt.imshow(x_train[555])
 plt.show()
