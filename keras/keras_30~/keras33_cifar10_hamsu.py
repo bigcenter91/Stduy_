@@ -1,6 +1,6 @@
 from tensorflow.keras.datasets import cifar10
-from tensorflow.python.keras.models import Sequential
-from tensorflow.python.keras.layers import Dense, Conv2D, Flatten, MaxPooling2D
+from tensorflow.python.keras.models import Sequential, Model
+from tensorflow.python.keras.layers import Dense, Conv2D, Flatten, MaxPooling2D, Input
 import numpy as np
 from tensorflow.python.keras.callbacks import EarlyStopping
 from sklearn.metrics import r2_score, accuracy_score
@@ -29,23 +29,17 @@ y_train = to_categorical(y_train)
 print(y_test.shape) # (10000, 10) / 이진 벡터로 변환
 
 #2. 모델 구성
-model = Sequential()
-model.add(Conv2D(16, 2,
-                 padding='same',
-                 input_shape=(32, 32, 3)))
 
-model.add(MaxPooling2D())
-# (2,2)중 가장 큰 값 뽑아서 반의 크기(14x14)로 재구성함
-# Maxpooling안에 디폴트가 (2,2)로 중첩되지 않도록 설정되어있음
+input1 = Input(shape=(32, 32, 3))
+conv1 = Conv2D(16, 2, padding='same')(input1)
+max = MaxPooling2D(pool_size=(2, 2))(conv1)
+conv2 = Conv2D(16, 2, padding='valid', activation='relu')(max)
+conv3 = Conv2D(16, 2, padding='same', activation='relu')(conv2)
+flat = Flatten()(conv3)
+output1 = Dense(10, activation='softmax')(flat)
+model = Model(inputs=input1, outputs=output1)
 
-model.add(Conv2D(16, 2, padding='valid', activation='relu'))
-model.add(Conv2D(16, 2))
-model.add(Conv2D(16, 2, padding='same', activation='relu'))
-model.add(Flatten())
-model.add(Dense(10, activation='softmax'))
-model.summary() # 요약하여 출력
-
-# print(np.unique(y_train, return_counts=True))
+model.summary()
 
 
 #3. 컴파일, 훈련

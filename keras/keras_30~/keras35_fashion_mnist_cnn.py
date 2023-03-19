@@ -17,8 +17,12 @@ print(x_train.shape, y_train.shape) # (60000, 28, 28) (60000,)
 print(x_test.shape, y_test.shape) # (10000, 28, 28) (10000,)
 
 scaler = MinMaxScaler() # Minmax : 최대값 - 최소값을 0과 1로 표현
-x_train = x_train/255.
-x_test = x_test/255. # .은 python의 부동소수를 보여주기 위해
+x_train = scaler.fit_transform(x_train.reshape(-1, 28*28))
+x_test = scaler.transform(x_test.reshape(-1, 28*28)) 
+
+x_train = x_train.reshape(-1, 28, 28, 1)
+x_test = x_test.reshape(-1, 28, 28, 1)
+# .은 python의 부동소수를 보여주기 위해
 
 print(x_train.shape, x_test.shape)
 
@@ -36,7 +40,7 @@ print(y_test.shape) # (10000, 10) / 이진 벡터로 변환
 model = Sequential()
 model.add(Conv2D(16, 2,
                  padding='same',
-                 input_shape=(32, 32, 3)))
+                 input_shape=(28, 28, 1)))
 
 model.add(MaxPooling2D())
 # (2,2)중 가장 큰 값 뽑아서 반의 크기(14x14)로 재구성함
@@ -49,7 +53,7 @@ model.add(Conv2D(32, 3, padding='same', activation='relu'))
 model.add(Conv2D(32, 3))
 model.add(MaxPooling2D())
 model.add(Flatten())
-model.add(Dense(100, activation='softmax'))
+model.add(Dense(10, activation='softmax'))
 model.summary() # 요약하여 출력
 
 # print(np.unique(y_train, return_counts=True))
@@ -82,6 +86,6 @@ acc = accuracy_score(np.argmax(y_test, axis=1), np.argmax(y_predict, axis=1))
 print('acc : ', acc)
 
 import matplotlib.pyplot as plt
-# plt.plot(hist.history['val_loss'], label='val_acc')
-plt.imshow(x_train[333])
+plt.plot(hist.history['val_loss'], label='val_acc')
+# plt.imshow(x_train[333])
 plt.show()
