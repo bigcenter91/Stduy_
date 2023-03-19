@@ -47,7 +47,7 @@ print(x.shape) # (1121, 79)
 
 # 1.6 train, test 분리
 x_train, x_test, y_train, y_test = train_test_split(
-    x, y, train_size=0.8, random_state=555, shuffle=True)
+    x, y, train_size=0.9, random_state=777, shuffle=True)
 
 #1.7 스케일링
 scaler = MinMaxScaler()
@@ -65,7 +65,7 @@ test_csv = scaler.transform(test_csv)
 # model.add(Dense(1))
 
 input1 = Input(shape=(79,))
-dense1 = Dense(100, activation='relu')(input1)
+dense1 = Dense(200, activation='relu')(input1)
 drop1 = Dropout(0.3)(dense1)
 dense2 = Dense(50, activation='relu')(drop1)
 drop2 = Dropout(0.3)(dense2)
@@ -73,16 +73,16 @@ dense3 = Dense(100, activation='relu')(drop2)
 drop3 = Dropout(0.3)(dense3)
 dense4 = Dense(50, activation='relu')(drop3)
 drop4 = Dropout(0.3)(dense4)
-dense5 = Dense(20, activation='relu')(drop4)
+dense5 = Dense(30, activation='relu')(drop4)
 output1 = Dense(1)(dense5)
 model = Model(inputs=input1, outputs=output1)
 
 # 3. 컴파일, 훈련
-model.compile(loss='mae', optimizer='adam', metrics=['acc'])
+model.compile(loss='mse', optimizer='adam', metrics=['acc'])
 es = EarlyStopping(monitor='val_loss', patience=200, verbose=1, 
                    mode='min', restore_best_weights=True)
 
-hist = model.fit(x_train, y_train, epochs=2000, batch_size=10, verbose=1, 
+hist = model.fit(x_train, y_train, epochs=2000, batch_size=79, verbose=1, 
                  validation_split=0.2, callbacks=[es])
 
 # 4. 평가, 예측
@@ -107,3 +107,7 @@ y_submit = np.array(y_submit)
 submission = pd.read_csv(path + 'sample_submission.csv', index_col=0)
 submission['SalePrice'] = y_submit
 submission.to_csv(path_save + 'kaggle_house_' + date + '.csv')
+
+# loss :  [19915.837890625, 0.0] // r2 :  0.8670969349672855 _mae, st sc
+# loss :  [21733.611328125, 0.0] // r2 :  0.7651612074060044 _mae, ru sc
+# loss :  [25060.10546875, 0.0] // r2 :  0.7667744305976125 _mae, ru sc
