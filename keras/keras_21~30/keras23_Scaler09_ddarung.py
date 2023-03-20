@@ -31,7 +31,7 @@ print(train_csv.shape)
 
 
 
-#2. 모델 구성
+
 print(type(train_csv))
 x = train_csv.drop(['count'], axis=1)
 y = train_csv['count']
@@ -50,6 +50,8 @@ print(np.min(x_test), np.max(x_test))
 
 # print(x_train.shape, x_test.shape)
 # print(y_train, y_test.shape)
+
+#2. 모델 구성
 
 model = Sequential()
 model.add(Dense(50, input_dim=9))
