@@ -14,15 +14,11 @@ from tensorflow.keras.utils import to_categorical
 print(x_train.shape, y_train.shape) # (60000, 28, 28) (60000,)
 print(x_test.shape, y_test.shape) # (10000, 28, 28) (10000,)
 
-scaler = MinMaxScaler() # Minmax : 최대값 - 최소값을 0과 1로 표현
-x_train = scaler.fit_transform(x_train.reshape(-1, 28*28))
-x_test = scaler.transform(x_test.reshape(-1, 28*28)) 
 
-x_train = x_train.reshape(-1, 28, 28, 1)
-x_test = x_test.reshape(-1, 28, 28, 1)
-# .은 python의 부동소수를 보여주기 위해
+x_train = x_train.reshape(60000, 784)
+x_test = x_test.reshape(10000, 784)
 
-print(x_train.shape, x_test.shape)
+print(x_train.shape, x_test.shape) # (60000, 784) (10000, 784)
 
 print(np.max(x_train), np.min(x_train)) # 1.0 0.0 / 이미지는 이렇게 쓰는게 괜찮다
 print(np.unique(y_train, return_counts=True))
@@ -32,26 +28,14 @@ print(y_train.shape) # (60000, )
 
 y_test = to_categorical(y_test)
 y_train = to_categorical(y_train)
-print(y_test.shape) # (10000, 10) / 이진 벡터로 변환
+
+print(y_test.shape) # (10000, 10)
 
 #2. 모델 구성
 model = Sequential()
-model.add(Conv2D(16, 2,
-                 padding='same',
-                 input_shape=(28, 28, 1)))
-
-model.add(MaxPooling2D())
-# (2,2)중 가장 큰 값 뽑아서 반의 크기(14x14)로 재구성함
-# Maxpooling안에 디폴트가 (2,2)로 중첩되지 않도록 설정되어있음
-# 큰놈만 빼보자/ 성능이 좋아질 때가 있고 안좋아질 때가 있다
-
-model.add(Conv2D(32, 3, padding='same', activation='relu'))
-model.add(Conv2D(32, 3))
-model.add(MaxPooling2D()) 
-model.add(Conv2D(32, 3, padding='same', activation='relu'))
-model.add(Conv2D(32, 3))
-model.add(MaxPooling2D())
-model.add(Flatten())
+model.add(Dense(64, input_shape=(784, )))
+model.add(Dense(64, activation='relu'))
+model.add(Dense(32, activation='relu'))
 model.add(Dense(10, activation='softmax'))
 
 model.summary() # 요약하여 출력
@@ -69,7 +53,7 @@ es = EarlyStopping(monitor='val_loss', patience=30, mode='min',
 import time
 start_time = time.time()
 
-hist = model.fit(x_train, y_train, epochs=100, batch_size=2000,
+hist = model.fit(x_train, y_train, epochs=100, batch_size=500,
                  validation_split=0.2, verbose=1, callbacks=[es])
 
 end_time = time.time()
@@ -89,3 +73,6 @@ import matplotlib.pyplot as plt
 plt.plot(hist.history['val_loss'], label='val_acc')
 # plt.imshow(x_train[333])
 plt.show()
+
+# result :  [0.8409841060638428, 0.7874000072479248]
+# acc :  0.7874

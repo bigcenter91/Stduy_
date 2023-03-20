@@ -40,6 +40,7 @@ model.add(Conv2D(64, (2,2), padding='same', input_shape=(28,28,1)))
 model.add(MaxPooling2D()) 
 # 반이 된다, 중첩되지 않아 있는거에서 제일 큰거 뽑아내 2,2로 준다
 # Maxpooling 안에 커널 사이즈 있겠지 그 디폴트가 2,2이고 중첩되지 않는다
+
 model.add(Conv2D(filters=64, kernel_size=(2,2), padding='valid', activation='relu'))
 model.add(Conv2D(32, 2)) # 2는 커널 사이즈 2,2 라는 표현
 model.add(Flatten()) # (None, 4608) > (None, 12, 12, 32) 곱한거

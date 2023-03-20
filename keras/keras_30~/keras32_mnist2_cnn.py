@@ -20,8 +20,8 @@ x_test = x_test.reshape(10000, 28, 28, 1)
 #reshape 할 때 데이터 구조만 바뀌지 순서와 내용은 바뀌지 않는다 / transepose는 열과 행을 바뀐다 반대로 구조가 바뀌는거다
 
 
-print(x_test.shape)
-print(y_test.shape)
+print(x_test.shape) # (10000, 28, 28, 1)
+print(y_test.shape) # (10000, )
 
 y_train = to_categorical(y_train)
 y_test = to_categorical(y_test)
@@ -88,3 +88,9 @@ print('acc : ', acc)
 import matplotlib.pyplot as plt
 plt.plot(hist.history['val_loss'], label='val_acc')
 plt.show()
+
+
+#이미지 데이터는 cnn이 좋다 보편적으로
+# result :  [0.0828157439827919, 0.9764999747276306] // acc :  0.9765
+# result :  [0.09381601959466934, 0.9753999710083008] // acc :  0.9754
+# result :  [0.0904429629445076, 0.9735999703407288] // acc :  0.9736

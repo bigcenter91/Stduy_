@@ -6,7 +6,7 @@ model = Sequential()
 model.add(Conv2D(7, (2,2), #보통 cnn에서는 이미지가 커도 2,2 / 3,3 많이 쓴다
                  padding='same',
                  input_shape=(8,8,1))) # 출력 : (N, 7, 7, 7) > (N, 8, 8, 7)_same을 썼을 때
-                            # batch_size, rows, columns, channels = input_shape
+                            # batch_size, rows, columns, channels = input_shape(4차원)
                             
                             # 계산:  (2*2*1+1)*7 = 35
                             

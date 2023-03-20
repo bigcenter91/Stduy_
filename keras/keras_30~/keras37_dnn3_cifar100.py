@@ -1,59 +1,48 @@
-from tensorflow.keras.datasets import fashion_mnist
+from tensorflow.keras.datasets import cifar100
 from tensorflow.python.keras.models import Sequential
 from tensorflow.python.keras.layers import Dense, Conv2D, Flatten, MaxPooling2D
 import numpy as np
 from tensorflow.python.keras.callbacks import EarlyStopping
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import r2_score, accuracy_score
 from sklearn.preprocessing import MinMaxScaler
 from tensorflow.keras.utils import to_categorical
 
 #1. 데이터
-(x_train, y_train), (x_test, y_test) = fashion_mnist.load_data()
+(x_train, y_train), (x_test, y_test) = cifar100.load_data()
 # 두 개의 튜플로 나눠서 할당하기 위해 사용
 
-print(x_train.shape, y_train.shape) # (60000, 28, 28) (60000,)
-print(x_test.shape, y_test.shape) # (10000, 28, 28) (10000,)
+print(x_train.shape, y_train.shape) # (50000, 32, 32, 3) (50000, 1)
+print(x_test.shape, y_test.shape) # (10000, 32, 32, 3) (10000, 1)
 
 scaler = MinMaxScaler() # Minmax : 최대값 - 최소값을 0과 1로 표현
-x_train = scaler.fit_transform(x_train.reshape(-1, 28*28))
-x_test = scaler.transform(x_test.reshape(-1, 28*28)) 
-
-x_train = x_train.reshape(-1, 28, 28, 1)
-x_test = x_test.reshape(-1, 28, 28, 1)
-# .은 python의 부동소수를 보여주기 위해
-
-print(x_train.shape, x_test.shape)
+x_train = x_train/255.
+x_test = x_test/255. # .은 python의 부동소수를 보여주기 위해
 
 print(np.max(x_train), np.min(x_train)) # 1.0 0.0 / 이미지는 이렇게 쓰는게 괜찮다
 print(np.unique(y_train, return_counts=True))
 
-print(y_test.shape) # (10000, )
-print(y_train.shape) # (60000, )
+print(y_test.shape) # (10000, 1)
+print(y_train.shape) # (50000, 1)
+
+# x_train = x_train.reshape(x_train.shape[0], -1)
+# x_test = x_test.reshape(x_test.shape[0], -1)
+x_train = x_train.reshape(50000,32*32*3)
+x_test = x_test.reshape(10000,-1)
+
+print(x_train.shape)
 
 y_test = to_categorical(y_test)
 y_train = to_categorical(y_train)
 print(y_test.shape) # (10000, 10) / 이진 벡터로 변환
 
 #2. 모델 구성
+
 model = Sequential()
-model.add(Conv2D(16, 2,
-                 padding='same',
-                 input_shape=(28, 28, 1)))
-
-model.add(MaxPooling2D())
-# (2,2)중 가장 큰 값 뽑아서 반의 크기(14x14)로 재구성함
-# Maxpooling안에 디폴트가 (2,2)로 중첩되지 않도록 설정되어있음
-# 큰놈만 빼보자/ 성능이 좋아질 때가 있고 안좋아질 때가 있다
-
-model.add(Conv2D(32, 3, padding='same', activation='relu'))
-model.add(Conv2D(32, 3))
-model.add(MaxPooling2D()) 
-model.add(Conv2D(32, 3, padding='same', activation='relu'))
-model.add(Conv2D(32, 3))
-model.add(MaxPooling2D())
-model.add(Flatten())
-model.add(Dense(10, activation='softmax'))
-
+model.add(Dense(64, input_shape=(3072, )))
+# model.add(Dense(64, input_shape=(28*28, )))
+model.add(Dense(64, activation='relu'))
+model.add(Dense(32, activation='relu'))
+model.add(Dense(100, activation='softmax'))
 model.summary() # 요약하여 출력
 
 # print(np.unique(y_train, return_counts=True))
@@ -61,7 +50,7 @@ model.summary() # 요약하여 출력
 
 #3. 컴파일, 훈련
 
-model.compile(loss = 'categorical_crossentropy', optimizer='Adagrad', metrics='acc')
+model.compile(loss = 'categorical_crossentropy', optimizer='adam', metrics='acc')
 
 es = EarlyStopping(monitor='val_loss', patience=30, mode='min',
                    verbose=1, restore_best_weights=True)
@@ -87,5 +76,5 @@ print('acc : ', acc)
 
 import matplotlib.pyplot as plt
 plt.plot(hist.history['val_loss'], label='val_acc')
-# plt.imshow(x_train[333])
+# plt.imshow(x_train[555])
 plt.show()
