@@ -13,9 +13,11 @@ from tensorflow.sklearn.model_selection import train_test_split
 datasets = load_boston()
 x = datasets.data
 y = datasets['target']
-x = x.reshape(506, 13, 1, 1)
+
 print(x.shape) # (506, 13)
 print(y.shape) # (506,)
+
+x = x.reshape(506, 13, 1, 1)
 
 x_train, x_test, y_train, y_test = train_test_split(
     x, y, train_size=0.8, random_state=123,

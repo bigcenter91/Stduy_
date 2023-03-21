@@ -1,5 +1,5 @@
 from tensorflow.python.keras.models import Sequential, Model
-from tensorflow.python.keras.layers import Dense, Input, Dropout
+from tensorflow.python.keras.layers import Dense, Input, Dropout, Conv2D, Flatten
 import pandas as pd
 from sklearn.preprocessing import MinMaxScaler, StandardScaler, MaxAbsScaler, RobustScaler, LabelEncoder
 from sklearn.model_selection import train_test_split
@@ -44,41 +44,56 @@ x = train_csv.drop(['SalePrice'], axis=1)
 y = train_csv['SalePrice']
 
 print(x.shape) # (1121, 79)
+x = np.array(x)
+x = x.reshape(-1, 79, 1, 1)
 
 # 1.6 train, test 분리
 x_train, x_test, y_train, y_test = train_test_split(
     x, y, train_size=0.9, random_state=777, shuffle=True)
 
 #1.7 스케일링
-scaler = MinMaxScaler()
-x_train = scaler.fit_transform(x_train)
-x_test = scaler.transform(x_test)
-test_csv = scaler.transform(test_csv)
+# scaler = MinMaxScaler()
+# x_train = scaler.fit_transform(x_train)
+# x_test = scaler.transform(x_test)
+# test_csv = scaler.transform(test_csv)
 
 #2. 모델구성
-# model = Sequential()
-# model.add(Dense(32, input_dim=8))
-# model.add(Dense(64))
-# model.add(Dense(64))
-# model.add(Dense(32))
-# model.add(Dense(8))
-# model.add(Dense(1))
+# input1 = Input(shape=(79,))
+# dense1 = Dense(200, activation='relu')(input1)
+# drop1 = Dropout(0.3)(dense1)
+# dense2 = Dense(50, activation='relu')(drop1)
+# drop2 = Dropout(0.3)(dense2)
+# dense3 = Dense(100, activation='relu')(drop2)
+# drop3 = Dropout(0.3)(dense3)
+# dense4 = Dense(50, activation='relu')(drop3)
+# drop4 = Dropout(0.3)(dense4)
+# dense5 = Dense(30, activation='relu')(drop4)
+# output1 = Dense(1)(dense5)
+# model = Model(inputs=input1, outputs=output1)
 
-input1 = Input(shape=(79,))
-dense1 = Dense(200, activation='relu')(input1)
-drop1 = Dropout(0.3)(dense1)
-dense2 = Dense(50, activation='relu')(drop1)
-drop2 = Dropout(0.3)(dense2)
-dense3 = Dense(100, activation='relu')(drop2)
-drop3 = Dropout(0.3)(dense3)
-dense4 = Dense(50, activation='relu')(drop3)
-drop4 = Dropout(0.3)(dense4)
-dense5 = Dense(30, activation='relu')(drop4)
-output1 = Dense(1)(dense5)
-model = Model(inputs=input1, outputs=output1)
+model = Sequential()
+
+model.add(Conv2D(3, (2,2), 
+                  padding='same',
+                 input_shape=(79,1,1))) # 출력 : 
+                                
+model.add(Conv2D(filters=4, 
+                  padding='same',
+                 kernel_size=(2,2),
+                 activation='relu')) 
+
+model.add(Conv2D(10, (2,2),
+                 padding='same',)) 
+                            
+model.add(Flatten())         
+model.add(Dense(32, activation='relu'))
+model.add(Dense(10, activation='relu'))      
+model.add(Dense(1, activation='linear'))
+model.summary()
 
 # 3. 컴파일, 훈련
 model.compile(loss='mse', optimizer='adam', metrics=['acc'])
+
 es = EarlyStopping(monitor='val_loss', patience=200, verbose=1, 
                    mode='min', restore_best_weights=True)
 
@@ -93,21 +108,3 @@ y_predict = model.predict(x_test)
 
 r2 = r2_score(y_test, y_predict)
 print('r2 : ', r2)
-
-# 4.1 내보내기
-# import datetime
-# date = datetime.datetime.now()
-# date = date.strftime('%m%d_%H%M')
-
-# y_submit = model.predict(test_csv)
-
-# y_submit = pd.DataFrame(y_submit)
-# y_submit = y_submit.fillna(0)
-# y_submit = np.array(y_submit)
-# submission = pd.read_csv(path + 'sample_submission.csv', index_col=0)
-# submission['SalePrice'] = y_submit
-# submission.to_csv(path_save + 'kaggle_house_' + date + '.csv')
-
-# loss :  [19915.837890625, 0.0] // r2 :  0.8670969349672855 _mae, st sc
-# loss :  [21733.611328125, 0.0] // r2 :  0.7651612074060044 _mae, ru sc
-# loss :  [25060.10546875, 0.0] // r2 :  0.7667744305976125 _mae, ru sc
