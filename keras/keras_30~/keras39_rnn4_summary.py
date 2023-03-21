@@ -29,28 +29,28 @@ model.add(Dense(1)) # (7 + 1) x 1 = 8
 model.summary()
 
 
-#3, 컴파일, 훈련
-model.compile(loss='mse', optimizer='adam')
+# #3, 컴파일, 훈련
+# model.compile(loss='mse', optimizer='adam')
 
-es = EarlyStopping(monitor='loss', patience=100, verbose=1, 
-                   mode='min', restore_best_weights=True)
+# es = EarlyStopping(monitor='loss', patience=100, verbose=1, 
+#                    mode='min', restore_best_weights=True)
 
-hist = model.fit(x, y, epochs=1000, callbacks=[es])
+# hist = model.fit(x, y, epochs=1000, callbacks=[es])
 
-# es = EarlyStopping(monitor='val_loss', patience=5, mode='min',
-#                    verbose=1, restore_best_weights=True)
-
-
-
-#4. 평가, 예측
-loss = model.evaluate(x, y)
-x_predict = np.array([6, 7, 8, 9, 10]).reshape(1, 5, 1) 
-#6, 7, 8, 9, 10이 1차원이니까 reshape 해준다 // #[[[7], [8], [9], [10]]]
-
-print(x_predict.shape)
+# # es = EarlyStopping(monitor='val_loss', patience=5, mode='min',
+# #                    verbose=1, restore_best_weights=True)
 
 
 
-result = model.predict(x_predict)
-print('loss :', loss)
-print('[6, 7, 8, 9, 10]의 결과: ', result)
+# #4. 평가, 예측
+# loss = model.evaluate(x, y)
+# x_predict = np.array([6, 7, 8, 9, 10]).reshape(1, 5, 1) 
+# #6, 7, 8, 9, 10이 1차원이니까 reshape 해준다 // #[[[7], [8], [9], [10]]]
+
+# print(x_predict.shape)
+
+
+
+# result = model.predict(x_predict)
+# print('loss :', loss)
+# print('[6, 7, 8, 9, 10]의 결과: ', result)

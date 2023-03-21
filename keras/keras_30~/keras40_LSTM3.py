@@ -1,6 +1,6 @@
 import numpy as np
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, SimpleRNN
+from tensorflow.keras.layers import Dense, LSTM
 from tensorflow.python.keras.callbacks import EarlyStopping
 
 #1. 데이터
@@ -21,7 +21,7 @@ print(x.shape) # (5, 5, 1) = RNN의 SHAPE를 맞춰줄려고 변경
 
 #2. 모델 구성
 model = Sequential()
-model.add(SimpleRNN(64, input_shape=(5, 1))) # 행빼고 나머지를 입력하죠? 32 output 노드의 갯수겠지
+model.add(LSTM(64, input_shape=(5, 1))) # 행빼고 나머지를 입력하죠? 32 output 노드의 갯수겠지
 # model.add(Dense(32, activation='relu'))
 # model.add(Dense(200, activation='relu'))
 # model.add(Dense(200, activation='relu'))
@@ -57,16 +57,3 @@ result = model.predict(x_predict)
 print('loss :', loss)
 print('[6, 7, 8, 9, 10]의 결과: ', result)
 print("걸린 시간 : ", round(end_time - start_time, 2))
-
-# loss : 1.7280808606301434e-05 [8, 9, 10]의 결과:  [[10.811575]] // epochs 1000
-# loss : 2.1646816094289534e-05 [8, 9, 10]의 결과:  [[10.838179]] 
-# loss : 5.456968427478004e-13  [6, 7, 8, 9, 10]의 결과:  [[10.634054]] training time :  14.43 gpu
-# loss : 2.728484213739002e-13 [6, 7, 8, 9, 10]의 결과:  [[10.684405]] training time :  2.94 cpu
-
-
-# loss : 0.00010419584577903152
-# [6, 7, 8, 9, 10]의 결과:  [[10.539905]]
-# 걸린 시간 :  18.27 // GPU
-# loss : 2.7034907361667138e-06
-# [6, 7, 8, 9, 10]의 결과:  [[10.401791]]
-# 걸린 시간 :  11.4 // CPU

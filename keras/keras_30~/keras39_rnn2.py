@@ -1,6 +1,6 @@
 import numpy as np
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, LSTM
+from tensorflow.keras.layers import Dense, SimpleRNN, LeakyReLU
 from tensorflow.keras.callbacks import EarlyStopping
 
 #1 데이터
@@ -18,7 +18,7 @@ print(x.shape) # (6, 4, 1)
 
 #2. 모델 구성
 model = Sequential()
-model.add(LSTM(32, input_shape=(4, 1))) # 행빼고 나머지를 입력하죠? 32 output 노드의 갯수겠지
+model.add(SimpleRNN(32, input_shape=(4, 1))) # 행빼고 나머지를 입력하죠? 32 output 노드의 갯수겠지
 model.add(Dense(100, activation='relu'))
 model.add(Dense(200, activation='relu'))
 model.add(Dense(50, activation='relu'))
