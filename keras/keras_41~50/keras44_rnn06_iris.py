@@ -3,7 +3,6 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, SimpleRNN
 from keras.callbacks import EarlyStopping
 from sklearn.model_selection import train_test_split
-from keras.callbacks import EarlyStopping
 from sklearn.metrics import accuracy_score, r2_score
 import numpy as np
 import pandas as pd
