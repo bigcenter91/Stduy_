@@ -19,6 +19,8 @@ print(test_csv.shape) # (6493, 8)
 x = train_csv.drop(['count','casual','registered'], axis = 1)
 y = train_csv['count']
 
+print (x.shape, y.shape)
+
 x = np.array(x)
 x = x.reshape(10886, 8, 1)
 

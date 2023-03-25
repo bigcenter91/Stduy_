@@ -1,0 +1,41 @@
+1 그래픽 드라이버
+2 CUDA 11.4.4 
+- vs intergration 설치 x
+
+3 CUDNN v8.2.4[Sep 2nd, 2021], for CUDA 11.4
+C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.4
+
+4 아나콘다
+5 vscode
+
+6 Tensorflow 2.7.4
+가상환경
+
+cmd > conda env list
+ca
+activate : 가상환경 진입
+
+deactivate : 빠져나오기
+
+conda create -n '이름설정' python='버전' anaconda : 가상 구성
+
+conda env list: 가상환경 리스트 확인
+
+activate '가상환경 이름'
+
+설치된거 확인: 'pip listㅁㅊ
+
+tensorflow 설치: pip install tensorflow-gpu==2.7.4
+
+conda env remove -n : 가상환경 제거
+
+
+
+python ctrl + z : python 빠져 나오기
+conda activate '환경 이름' : 가상환경 진입
+
+
+
+
+
+https://blog.naver.com/gema0000
