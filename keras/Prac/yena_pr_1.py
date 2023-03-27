@@ -18,7 +18,6 @@ y = datasets['T (degC)']
 x_train,x_test,y_train,y_test = train_test_split(x,y,train_size=0.7,shuffle=False)
 x_test,x_predict,y_test,y_predict = train_test_split(x_test,y_test,train_size=2/3,shuffle=False)
 print(x_train.shape,y_train.shape) # (294385, 13) (294385,)
-
 timesteps = 10
 
 def split_x(datasets, timesteps): # split_x라는 함수를 정의
@@ -43,7 +42,8 @@ print(np.unique(y_train))
 model = load_model('./_save/MCP/kaggle_jena/kaggle_jena_0326_0154.h5')
 
 #3 컴파일, 훈련
-model.compile(loss = 'mse', optimizer = 'adam')
+model.compile(loss = 'mse',
+              optimizer = 'adam')
 
 #4 평가, 예측
 loss = model.evaluate(x_test_split,y_test_split)

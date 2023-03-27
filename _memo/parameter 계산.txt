@@ -1,0 +1,22 @@
+parameter 계산
+
+CNN
+입력: Batch_size/ rows/ columns/ channels 4차원
+출력: 4차원
+
+DNN
+입력: 2차원
+출력: 2차원
+Dense 레이어
+
+RNN
+입력: Batch/ timesteps/ feature 3차원
+출력: 2차원(리턴 시퀀스 쓰면 3차원)
+
+LSTM
+입력: Batch/ timesteps/ feature 3차원
+출력: 2차원(리턴 시퀀스 쓰면 3차원)
+
+GRU
+입력: Batch/ timesteps/ feature 3차원
+출력: 2차원(리턴 시퀀스 쓰면 3차원)

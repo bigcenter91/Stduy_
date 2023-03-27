@@ -1,0 +1,18 @@
+# 삼성전자와 현대자동차 주가로 삼성전자 주가 맞추기
+
+# 각각 데이터에서 컬럼 7개 이상 추출(그 중 거래량은 반드시 들어갈 것)
+# timesteps와 feature는 알아서 잘라라
+
+# 제공된 데이터 외 주가 데이터 사용금지
+
+#1. 삼성전자 28일(화) 종가 맞추기 (점수 배정 0.3)
+#2. 삼성전자 29일(수) 아침 시가 맞추기(점수 배정 0.7)
+
+'''
+ 메일 제목 : 이름 [삼성 1차] 60,350.07원
+ 첨부파일 keras53_samsung2_yys_submit.py
+         keras53_samsung4_yys_submit.py
+
+ 가중치: _save/samsung/keras53_samsung2_yys.h5 / hdf5
+        _save/samsung/keras53_samsung4_yys._h5 / hdf5
+'''
