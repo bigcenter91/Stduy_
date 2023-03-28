@@ -4,7 +4,7 @@ from tensorflow.keras.models import Sequential, load_model, Model
 from tensorflow.keras.layers import Dense, LSTM, GRU, Conv1D, Conv2D, SimpleRNN, Concatenate, concatenate, Dropout, Bidirectional, Flatten, MaxPooling2D, Input
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import MinMaxScaler, StandardScaler, MaxAbsScaler, RobustScaler
+from sklearn.preprocessing import MinMaxScaler, StandardScaler, MaxAbsScaler, RobustScaler,Normalizer
 from sklearn.metrics import r2_score, mean_squared_error
 import matplotlib.pyplot as plt
 import datetime
@@ -25,26 +25,24 @@ def split_x(dt, st):
 path = './_data/시험/'
 path_save = './_save/samsung/'
 
-datasets_samsung = pd.read_csv(path + '삼성전자 주가2.csv', index_col=0, encoding='cp949')
-datasets_hyundai = pd.read_csv(path + '현대자동차.csv', index_col=0, encoding='cp949')
+datasets_s = pd.read_csv(path + '삼성전자 주가3.csv', index_col=0, encoding='EUC-KR')
+datasets_h = pd.read_csv(path + '현대자동차2.csv', index_col=0, encoding='EUC-KR')
 
-print(datasets_samsung.shape, datasets_hyundai.shape)
-print(datasets_samsung.columns, datasets_hyundai.columns)
-print(datasets_samsung.info(), datasets_hyundai.info())
-print(datasets_samsung.describe(), datasets_hyundai.describe())
-print(type(datasets_samsung), type(datasets_hyundai))
+print(datasets_s.shape, datasets_h.shape)
+print(datasets_s.columns, datasets_h.columns)
+print(datasets_s.info(), datasets_h.info())
+print(datasets_s.describe(), datasets_h.describe())
+print(type(datasets_s), type(datasets_h))
 
-samsung_x = np.array(datasets_samsung.drop(['전일비', '종가'], axis=1))
-samsung_y = np.array(datasets_samsung['종가'])
-hyundai_x = np.array(datasets_hyundai.drop(['전일비', '종가'], axis=1))
-hyundai_y = np.array(datasets_hyundai['종가'])
+samsung_x = np.array(datasets_s.drop(['전일비', '종가'], axis=1))
+samsung_y = np.array(datasets_s['종가'])
+hyundai_x = np.array(datasets_h.drop(['전일비', '종가'], axis=1))
+hyundai_y = np.array(datasets_h['종가'])
 
-samsung_x = samsung_x[:180, :]
-samsung_y = samsung_y[:180]
-hyundai_x = hyundai_x[:180, :]
-hyundai_y = hyundai_y[:180]
-
-print(samsung_x.shape)
+samsung_x = samsung_x[:200, :]
+samsung_y = samsung_y[:200]
+hyundai_x = hyundai_x[:200, :]
+hyundai_y = hyundai_y[:200]
 
 # samsung_x = samsung_x[:1200, :]
 # samsung_y = samsung_y[:1200]
@@ -64,8 +62,8 @@ samsung_y = np.char.replace(samsung_y.astype(str), ',', '').astype(np.float64)
 hyundai_x = np.char.replace(hyundai_x.astype(str), ',', '').astype(np.float64)
 hyundai_y = np.char.replace(hyundai_y.astype(str), ',', '').astype(np.float64)
 
-samsung_x_train, samsung_x_test, samsung_y_train, samsung_y_test, hyundai_x_train, hyundai_x_test, hyundai_y_train, hyundai_y_test = train_test_split(samsung_x, samsung_y, hyundai_x, hyundai_y,
-                                                                                                                                                      train_size=0.7, shuffle=False)
+samsung_x_train, samsung_x_test, samsung_y_train, samsung_y_test, hyundai_x_train, hyundai_x_test, hyundai_y_train, hyundai_y_test = train_test_split(
+    samsung_x, samsung_y, hyundai_x, hyundai_y, train_size=0.7, shuffle=False)
 
 scaler = MinMaxScaler()
 samsung_x_train = scaler.fit_transform(samsung_x_train)
@@ -85,68 +83,71 @@ samsung_y_test_split = samsung_y_test[timesteps:]
 hyundai_y_train_split = hyundai_y_train[timesteps:]
 hyundai_y_test_split = hyundai_y_test[timesteps:]
 
-print(samsung_x_train_split.shape)      # (820, 20, 14)
-print(hyundai_x_train_split.shape)      # (820, 20, 14)
+print(samsung_x_train_split)      # (820, 20, 14)
+print(hyundai_x_train_split)      # (820, 20, 14)
 
-# 2. 모델구성
-# 2.1 모델1
-input1 = Input(shape=(20, 14))
+#2. 모델구성
+#2.1 모델1
+input1 = Input(shape=(timesteps, 14))
 dense1 = LSTM(100, activation='relu', name='samsung1')(input1)
-dense2 = Dense(200, activation='relu', name='samsung2')(dense1)
-dense3 = Dense(300, activation='relu', name='samsung3')(dense2)
-output1 = Dense(110, activation='relu', name='samsung4')(dense3)
+flat = Flatten()(dense1)
+dense2 = Dense(300, activation='relu', name='samsung2')(flat)
+drop1 = Dropout(0.3)(dense2)
+dense3 = Dense(50, activation='relu', name='samsung3')(drop1)
+drop2 = Dropout(0.3)(dense3)
+dense4 = Dense(300, activation='relu', name='samsung4')(drop2)
+drop3 = Dropout(0.3)(dense4)
+dense5 = Dense(200, activation='relu', name='samsung5')(drop3)
+drop4 = Dropout(0.3)(dense5)
+output1 = Dense(110, activation='relu', name='samsung6')(drop4)
 
-# 2.2 모델2
-input2 = Input(shape=(20, 14))
-dense11 = LSTM(100, name='huyndai1')(input2)
-dense12 = Dense(100, name='huyndai2')(dense11)
-dense13 = Dense(100, name='huyndai3')(dense12)
-dense14 = Dense(100, name='huyndai4')(dense13)
+#2.2 모델2
+input2 = Input(shape=(timesteps, 14))
+dense11 = LSTM(100, activation='relu', name='hyundai1')(input2)
+flat = Flatten()(dense11)
+dense12 = Dense(200, activation='relu', name='hyundai2')(flat)
+drop1 = Dropout(0.3)(dense12)
+dense13 = Dense(100, activation='relu', name='hyundai3')(drop1)
+drop2 = Dropout(0.3)(dense13)
+dense14 = Dense(200, activation='relu', name='hyundai4')(drop2)
 output2 = Dense(110, name='output2')(dense14)
 
-# 2.3 머지
+#2.3 머지
 merge1 = Concatenate(name='mg1')([output1, output2])
-merge2 = Dense(200, activation='relu', name='mg2')(merge1)
-merge3 = Dense(300, activation='relu', name='mg3')(merge2)
+merge2 = Dense(100, activation='relu', name='mg2')(merge1)
+merge3 = Dense(20, activation='relu', name='mg3')(merge2)
 hidden_output = Dense(100, name='last')(merge3)
 
-# 2.5 분기1
-bungi1 = Dense(10, activation='selu', name='bg1')(hidden_output)
-bungi2 = Dense(10, name='bg2')(bungi1)
+#2.4 분기1
+bungi1 = Dense(100, activation='selu', name='bg1')(hidden_output)
+bungi2 = Dense(20, name='bg2')(bungi1)
 last_output1 = Dense(1, name='last1')(bungi2)
 
-# 2.6 분기2
+#2.5 분기2
 last_output2 = Dense(1, activation='linear', name='last2')(hidden_output)
 model = Model(inputs=[input1, input2], outputs=[last_output1, last_output2])
 
 model.summary()
 
-# 3. 컴파일, 훈련
-model.compile(loss='mse', optimizer='adam')
-es = EarlyStopping(monitor='val_loss', mode='min', patience=30, restore_best_weights=True)
-hist = model.fit([samsung_x_train_split, hyundai_x_train_split], [samsung_y_train_split, hyundai_y_train_split], epochs=100, batch_size=64, validation_split=0.2, callbacks=[es])
+#3. 컴파일, 훈련
+model.compile(loss='mae', optimizer='adam')
 
-model.save(path_save + 'keras53_samsung2_lsh.h5')
+es = EarlyStopping(monitor='val_loss', mode='min', patience=50, restore_best_weights=True)
 
-# 4. 평가, 예측
+hist = model.fit([samsung_x_train_split, hyundai_x_train_split], [samsung_y_train_split, hyundai_y_train_split], 
+                 epochs=1000, batch_size=32, validation_split=0.2, callbacks=[es])
+
+model.save(path_save + 'keras53_samsung2_kdj.h5')
+
+#4. 평가, 예측
 loss = model.evaluate([samsung_x_test_split, hyundai_x_test_split], [samsung_y_test_split, hyundai_y_test_split])
 print('loss : ', loss)
 
-result = model.predict([samsung_x_test_split, hyundai_x_test_split])
+samsung_x_predict = samsung_x_test[-timesteps:]
+samsung_x_predict = samsung_x_predict.reshape(1, timesteps, 14)
+hyundai_x_predict = hyundai_x_test[-timesteps:]
+hyundai_x_predict = hyundai_x_predict.reshape(1, timesteps, 14)
 
-r2_1 = r2_score(samsung_y_test_split, result[0])
-r2_2 = r2_score(hyundai_y_test_split, result[0])
+predict_result = model.predict([samsung_x_predict, hyundai_x_predict])
 
-print('r2_1 : ', r2_1)
-print('r2_2 : ', r2_2)
-
-result = np.array(result)
-print(result.shape)
-# result = result.reshape(2, 10)
-result = result.reshape(2, 35)
-result = result.T
-print(result.shape)
-
-last_result = np.round(result[34, 0], 2)
-# last_result = np.round(result[9, 0], 2)
-print("내일의 종가는 : ", last_result)
+print("종가는 : ", np.round(predict_result[0], 2))

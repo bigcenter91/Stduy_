@@ -1,0 +1,16 @@
+timesteps로 자를 땐 순서가 명확해야한다
+
+
+7, 4짜리가
+timesteps으로 자르면 5,3,4가 되지
+덩어리 하나가 timestep이 가춰줬지?
+
+timesteps가 된다음에는 shuffle해도 된다
+조금 더 과적합이 방지가 되겠지?
+
+항상 문제는 뭐야? 과적합이야
+
+훈련 때만 좋으면 문제가 된다 
+
+
+dense에서 concatenate해서 lstm은 굳이 쓸려면 바꿔줘야한다
