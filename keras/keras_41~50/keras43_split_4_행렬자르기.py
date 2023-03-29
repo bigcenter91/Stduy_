@@ -17,7 +17,7 @@ timesteps = 3
 #####x 만들기 #####
 def split_x(dataset, timesteps): 
     aaa = []
-    for i in range(len(dataset) - timesteps ):
+    for i in range(len(dataset) - timesteps):
         subset = dataset[i : (i + timesteps)]
         aaa.append(subset)
     return np.array(aaa)
