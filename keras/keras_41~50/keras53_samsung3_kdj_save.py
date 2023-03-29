@@ -103,14 +103,15 @@ output1 = Dense(120, activation='relu', name='samsung6')(dense5)
 input2 = Input(shape=(timesteps, 14))
 dense11 = LSTM(100, activation='relu', name='hyundai1')(input2)
 flat = Flatten()(dense11)
-dense12 = Dense(300, activation='relu', name='hyundai2')(flat)
+dense12 = Dense(500, activation='relu', name='hyundai2')(flat)
 drop1 = Dropout(0.3)(dense12)
-dense13 = Dense(100, activation='relu', name='hyundai3')(drop1)
+dense13 = Dense(200, activation='relu', name='hyundai3')(drop1)
 drop2 = Dropout(0.3)(dense13)
-dense14 = Dense(300, activation='relu', name='hyundai4')(drop2)
+dense14 = Dense(500, activation='relu', name='hyundai4')(drop2)
 drop3 = Dropout(0.3)(dense14)
-dense15 = Dense(200, activation='relu', name='hyundai5')(drop3)
-output2 = Dense(120, name='output2')(dense15)
+dense15 = Dense(300, activation='relu', name='hyundai5')(drop3)
+drop4 = Dropout(0.3)(dense15)
+output2 = Dense(120, name='output2')(drop4)
 
 #2.3 머지
 merge1 = Concatenate(name='mg1')([output1, output2])
@@ -132,7 +133,7 @@ model.summary()
 #3. 컴파일, 훈련
 model.compile(loss='mse', optimizer='adam', metrics=['mae'])
 
-es = EarlyStopping(monitor='val_loss', mode='min', patience=50, restore_best_weights=True)
+es = EarlyStopping(monitor='val_loss', mode='min', patience=100, restore_best_weights=True)
 
 hist = model.fit([samsung_x_train_split, hyundai_x_train_split], [samsung_y_train_split, hyundai_y_train_split], 
                  epochs=5000, batch_size=64, validation_split=0.2, callbacks=[es])
