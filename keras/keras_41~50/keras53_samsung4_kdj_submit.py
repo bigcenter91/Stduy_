@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 import datetime
 date = datetime.datetime.now()
 date = date.strftime('%m%d_%H%M%S')
+
 def RMSE(x,y):
     return np.sqrt(mean_squared_error(x,y))
 
@@ -84,9 +85,15 @@ hyundai_y_test_split = hyundai_y_test[(timesteps+1):]
 print(samsung_x_train_split.shape)      # (119, 20, 13)
 print(hyundai_x_train_split.shape)      # (119, 20, 13)
 
+from tensorflow.keras.optimizers import Adam
+class CustomAdam(Adam):
+    pass
 
-model = load_model('./_save/samsung/keras53_samsung4_kdj.h5')
 
+optimizer = Adam()
+
+
+model = load_model('./_save/samsung/adddaa.h5')
 
 #3. 컴파일, 훈련
 model.compile(loss='mse', optimizer='adam', metrics=['mae'])

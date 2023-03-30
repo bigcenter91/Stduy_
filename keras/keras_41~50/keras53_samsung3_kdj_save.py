@@ -136,9 +136,9 @@ model.compile(loss='mse', optimizer='adam', metrics=['mae'])
 es = EarlyStopping(monitor='val_loss', mode='min', patience=100, restore_best_weights=True)
 
 hist = model.fit([samsung_x_train_split, hyundai_x_train_split], [samsung_y_train_split, hyundai_y_train_split], 
-                 epochs=5000, batch_size=64, validation_split=0.2, callbacks=[es])
+                 epochs=1, batch_size=64, validation_split=0.2, callbacks=[es])
 
-model.save(path_save + 'keras53_samsung4_kdj.h5')
+model.save(path_save + 'adddaa.h5')
 
 #4. 평가, 예측
 loss = model.evaluate([samsung_x_test_split, hyundai_x_test_split], [samsung_y_test_split, hyundai_y_test_split])
