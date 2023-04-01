@@ -23,13 +23,16 @@ print(x_train[0].shape)
 print(x_train[1].shape)
 print(x_train[0][0].shape)
 
-print(np.tile(x_train[0].reshape(28,28), augment_size).reshape(-1, 28, 28, 1).shape)
+x = np.tile(x_train[0].reshape(28,28), augment_size).reshape(-1, 28, 28, 1)
+print(x.shape)
+x = (np.tile(x_train[0], augment_size))
+print(x.shape)
 
 print(np.zeros(augment_size))
 print(np.zeros(augment_size).shape) # (100, )
 
 x_data = train_datagen.flow(
-    np.tile(x_train[0].reshape(28,28),
+    np.tile(x_train[0].reshape(28*28),
             augment_size).reshape(-1, 28, 28, 1), # x데이터
     np.zeros(augment_size), # y 데이터: 그림만 그릴꺼라 필요없어서 걍 0 넣줬어
     batch_size=augment_size,

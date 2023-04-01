@@ -1,6 +1,9 @@
 import numpy as np
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
+@profile
+def my_function():
+    
 #1. 데이터
 
 path = 'd:/study_data/_save/_npy/'
@@ -46,7 +49,8 @@ model.add(Dense(8, activation='relu'))
 model.add(Dense(1, activation='sigmoid'))
 
 #3. 컴파일, 훈련
-model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['acc'])
+model.compile(loss='categorical_crossentropy', optimizer='adam',
+              metrics=['acc'])
 
 hist = model.fit(x_train, y_train, epochs=30, # xy_train을 넣으면 x,y 데이터/ 배치 사이즈까지 끝난거다
                     steps_per_epoch=32,  # 전체 데이터 크기/batch = 160/5 = 32 // 32(계산한만큼) 이상주면 에러난다 // 안써줘도 돌아간다
@@ -62,6 +66,7 @@ loss = hist.history['loss']
 val_loss = hist.history['val_loss']
 acc = hist.history['acc']
 val_acc = hist.history['val_acc']
+
 
 # # print(acc[-1])
 # print('loss : ', loss[-1])
