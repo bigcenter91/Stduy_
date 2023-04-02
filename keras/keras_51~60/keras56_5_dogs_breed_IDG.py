@@ -32,6 +32,10 @@ dog_x_train, dog_x_test, dog_y_train, dog_y_test = train_test_split(
     dog_x, dog_y, train_size=0.7, shuffle=True, random_state=123,
 )
 
+print(dog_x_train.shape, dog_x_test.shape)
+print(dog_y_train.shape, dog_y_test.shape)
+
+
 np.save(save_path + 'keras56_5_dog_x_train.npy', arr=dog_x_train)
 np.save(save_path + 'keras56_5_dog_x_test.npy', arr=dog_x_test)
 np.save(save_path + 'keras56_5_dog_y_train.npy', arr=dog_y_train)

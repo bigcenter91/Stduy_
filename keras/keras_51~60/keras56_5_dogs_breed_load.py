@@ -38,6 +38,11 @@ hist = model.fit(dog_x_train, dog_y_train, epochs=50,
                  )
 
 
+loss = hist.history['loss']
+val_loss = hist.history['val_loss']
+acc = hist.history['acc']
+val_acc = hist.history['val_acc']
+
 # 4. 평가, 예측
 loss = model.evaluate(dog_x_test, dog_y_test)
 print('loss : ', loss)
