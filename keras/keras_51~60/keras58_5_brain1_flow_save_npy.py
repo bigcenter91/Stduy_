@@ -1,5 +1,11 @@
 import numpy as np
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
+from sklearn.model_selection import train_test_split
+
+path = 'd:/study_data/_data/brain/'
+save_path = 'd:/study_data/_save/brain/'
+
+#1. 데이터
 
 train_datagen = ImageDataGenerator(
     rescale=1./255,
@@ -14,19 +20,23 @@ train_datagen = ImageDataGenerator(
     # 증폭 옵션이다
 )
 
+train_datagen2 = ImageDataGenerator(
+    rescale=1./1,
+
+)
+
+augment_size = 1000
+
 # minmaxscaler 할 필요가 없다 1./255, 하니까 한마디로 0~1사이로 정규화를 한다는 얘기
 
 test_datagen = ImageDataGenerator(
     rescale=1./255,
-    
-    # train이랑 다른 이유는 평가 데이터를 증폭한다는건 데이터를 조작한다는거다
 )
-# 이터레이터 형태로 수치화 한다
-#x, y빼서 쓰면 되겠네
+
 xy_train = train_datagen.flow_from_directory(
     'd:/study_data/_data/brain/train/',
     target_size=(200,200),
-    batch_size=7,
+    batch_size=5,
     class_mode='binary', # 바이너리 0과 1로 : 수치화해서 만들어준다
     color_mode='grayscale', # 흑백
     shuffle=True,
@@ -42,28 +52,21 @@ xy_test = test_datagen.flow_from_directory(
     class_mode='binary',
     color_mode='grayscale', 
     shuffle=True,
-) # Found 120 images belonging to 2 classes. x = 120, 200, 200, 1 / y = 120, 
-# numpy np.unique
-# pandas value count??
+)
 
-# <keras.preprocessing.image.DirectoryIterator object at 0x000002AAA9385F70>
-# 0x000002AAA9385F70 메모리 주소 값
+brain_x_train = xy_train[0][0]
+brain_y_train = xy_train[0][1]
+brain_x_test = xy_test[0][0]
+brain_y_test = xy_test[0][1]
 
-print(xy_train) 
-print(xy_train[0]) # 32
-# y : array([0., 0., 1., 0., 1.] / 그 앞에 나온게 x값
-print(len(xy_train[0])) # 2 : xy이기 때문에
-print(xy_train[0][0]) # 0번째에 0번째 / X가 다섯개 들어가있다
-print(xy_train[0][1]) # [1. 0. 0. 0. 1.]
+print(brain_x_train.shape, brain_x_test.shape) # 5, 200, 200, 1) (5, 200, 200, 1)
+print(brain_x_train[0].shape)
+print(brain_x_train[0][1].shape)
 
-print(xy_train[0][0].shape) # (5, 200, 200, 1)
-print(xy_train[0][1].shape) # (5,)
-# 리스트에서는 shape 먹히지 않아
-# 배치사이즈 크기, X,Y
 
-print("================================================")
-
-print(type(xy_train)) # <class 'keras.preprocessing.image.DirectoryIterator'>
-print(type(xy_train[0])) # <class 'tuple'> 리스트와 튜플의 차이 바꾸지 못한다
-print(type(xy_train[0][1])) # <class 'numpy.ndarray'>
-
+'''
+np.save(save_path + 'keras58_brain_x_train.npy', arr=brain_x_train)
+np.save(save_path + 'keras58_brain_y_train.npy', arr=brain_y_train)
+np.save(save_path + 'keras58_brain_x_test.npy', arr=brain_x_test)
+np.save(save_path + 'keras58_brain_y_test.npy', arr=brain_y_test)
+'''

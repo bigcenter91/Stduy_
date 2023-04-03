@@ -15,14 +15,14 @@ dog_y_test = np.load(path + 'keras56_5_dog_y_test.npy')
 
 print(dog_x_train)
 print(dog_x_test.shape, dog_y_test.shape) 
-# (300, 200, 200, 3) (300, 5)
+# (300, 500, 500, 3) (300, 5)
 
 
 
 model = Sequential()
-model.add(Conv2D(32, (3,3), input_shape=(500, 500, 4), activation='relu'))
+model.add(Conv2D(64, (3,3), input_shape=(500, 500, 4), activation='relu'))
+model.add(Conv2D(64, (2,2), activation='relu'))
 model.add(Conv2D(32, (2,2), activation='relu'))
-model.add(Conv2D(16, (2,2), activation='relu'))
 model.add(Flatten())
 model.add(Dense(32, activation='relu'))
 model.add(Dense(16, activation='relu'))
@@ -42,6 +42,7 @@ loss = hist.history['loss']
 val_loss = hist.history['val_loss']
 acc = hist.history['acc']
 val_acc = hist.history['val_acc']
+
 
 # 4. 평가, 예측
 loss = model.evaluate(dog_x_test, dog_y_test)

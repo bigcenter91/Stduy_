@@ -102,7 +102,7 @@ model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['acc'])
 hist = model.fit_generator(xy_train, epochs=30, # xy_train을 넣으면 x,y 데이터/ 배치 사이즈까지 끝난거다
                     steps_per_epoch=32,  # 전체 데이터 크기/batch = 160/5 = 32 // 32(계산한만큼) 이상주면 에러난다 // 안써줘도 돌아간다
                     validation_data=xy_test,
-                    validation_steps=24, # 발리데이터/batch = 120/5 = 24
+                    validation_steps=24, # 발리데이터/batch = 120/5 = 24 / step과 epochs 같은 개념이야
                     )
 
 loss = hist.history['loss']

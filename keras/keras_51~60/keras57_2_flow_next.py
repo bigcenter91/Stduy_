@@ -37,20 +37,39 @@ x_data = train_datagen.flow(
     np.zeros(augment_size), # y 데이터: 그림만 그릴꺼라 필요없어서 걍 0 넣줬어
     batch_size=augment_size,
     shuffle=True
-)
+) .next()
 
+
+# xy가 다 나온다 : xy의 0번째
+################################## .next() 사용 ##########################
 print(x_data)
-# <keras.preprocessing.image.NumpyArrayIterator object at 0x000001A490454D30>
-
+print(type(x_data)) # <class 'tuple'>
 print(x_data[0])
-print(x_data[0][0].shape) # (100, 28, 28, 1)
-print(x_data[0][1].shape) # y가 들어가 있겠지? (100, )
+print(x_data[1])
+print(x_data[0].shape, x_data[1].shape) # 튜플 안에 numpy가 들어가 있어서 shape를 찍을 수 있다
+print(type(x_data[0])) # <class 'numpy.ndarray'>
+
+# 튜플에 x, y데이터 들어가 있고 x,y가 numpy로 되있는거다
+# 이터레이터 형식으로 1배치가 데이터 구조
+
+################################## .next() 미사용 ##########################
+#print(x_data)
+# <keras.preprocessing.image.NumpyArrayIterator object at 0x000001A490454D30>
+# print(x_data[0])
+# print(x_data[0][0].shape) # (100, 28, 28, 1)
+# print(x_data[0][1].shape) # y가 들어가 있겠지? (100, )
+
+
 
 import matplotlib.pyplot as plt
 plt.figure(figsize=(7,7))
 for i in range(49):
     plt.subplot(7, 7, i+1)
     plt.axis('off')
-    plt.imshow(x_data[0][0][i], cmap='gray')
+    # plt.imshow(x_data[0][0][i], cmap='gray') # .next() 미사용 // 위에 .next를 지우면 shape 다르다고 오류뜸
+    # .next는 xy 한덩어리를 그대로 가져오겠다
+    # 이해가 안되면 갖다 땡겨 쓰도록 그것도 실력이다
+    plt.imshow(x_data[0][i], cmap='gray')
+    
     # 총 49개의 plot을 만들거고
 plt.show()
