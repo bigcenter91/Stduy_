@@ -1,0 +1,27 @@
+이진분류 평가지표
+acc
+
+f1_scoree
+내가 예측한 것에서 암환자가 나올 확률
+내가 예측하지 않는 것에서 암환자가 나올 확률
+총 네번을 계산
+
+
+next 함수
+iter에서 그 다음 데이터 뿜어주는거
+
+print(np.unique(y_train)
+pandas에서는 value_counts
+
+weather_2108_x, weather_2108_y, weather_2208_x, weather_2208_y, 
+rice_21_x, rice_21_y, rice_22_x, rice_22_y
+
+pdf/ ppt
+이름_개인프로젝트_프로젝트명.ppt.pdf
+
+모델에 대한 아키텍쳐 좋아
+근데 자기걸 표현해 파라미터 양이 나와야하고
+
+시각화 한게 있어야한다
+
+평가지표 명시해야한다

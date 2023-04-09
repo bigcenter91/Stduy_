@@ -78,6 +78,8 @@ samsung_y_test_split = samsung_y_test[timesteps:]
 hyundai_y_train_split = hyundai_y_train[timesteps:]
 hyundai_y_test_split = hyundai_y_test[timesteps:]
 
+print(samsung_x_train_split)      # (120, 20, 14)
+
 print(samsung_x_train_split.shape)      # (120, 20, 14)
 print(hyundai_x_train_split.shape)      # (120, 20, 14)
 
@@ -139,7 +141,10 @@ loss = model.evaluate([samsung_x_test_split, hyundai_x_test_split], [samsung_y_t
 print('loss : ', loss)
 
 samsung_x_predict = samsung_x_test[-timesteps:]
+print(samsung_x_predict.shape)
 samsung_x_predict = samsung_x_predict.reshape(1, timesteps, 14)
+print(samsung_x_predict.shape)
+
 hyundai_x_predict = hyundai_x_test[-timesteps:]
 hyundai_x_predict = hyundai_x_predict.reshape(1, timesteps, 14)
 
