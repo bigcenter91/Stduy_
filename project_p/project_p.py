@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 import datetime
 date = datetime.datetime.now()
 date = date.strftime('%m%d_%H%M%S')
+
 def RMSE(x,y):
     return np.sqrt(mean_squared_error(x,y))
 
