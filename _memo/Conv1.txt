@@ -1,0 +1,38 @@
+# # 2.1 모델1
+# input1 = Input(shape=(timesteps, weather_g_x.shape[1]))
+# conv11 = Conv1D(16, kernel_size=3, activation='relu', name='gwangju1')(input1)
+# pool11 = MaxPooling1D(pool_size=1)(conv11)
+# flatten1 = Flatten()(pool11)
+# dense14 = Dense(64, activation='relu', name='gwangju2')(flatten1)
+# drop11 = Dropout(0.125)(dense14)
+# dense15 = Dense(32, activation='relu', name='gwangju3')(drop11)
+# drop12 = Dropout(0.125)(dense15)
+# output1 = Dense(32, name='output1')(drop12)
+
+# # 2.2 모델2
+# input2 = Input(shape=(timesteps, weather_j_x.shape[1]))
+# conv21 = Conv1D(16, kernel_size=3, activation='relu', name='jeonju1')(input2)
+# pool21 = MaxPooling1D(pool_size=1)(conv21)
+# flatten2 = Flatten()(pool21)
+# dense24 = Dense(64, activation='relu', name='jeonju4')(flatten2)
+# output2 = Dense(64, name='output2')(dense24)
+
+# # 2.3 모델3
+# input3 = Input(shape=(timesteps, weather_m_x.shape[1]))
+# conv31 = Conv1D(16, kernel_size=3, activation='relu', name='mokpo1')(input3)
+# pool31 = MaxPooling1D(pool_size=1)(conv31)
+# flatten3 = Flatten()(pool31)
+# dense34 = Dense(256, activation='relu', name='mokpo4')(flatten3)
+# output3 = Dense(64, name='output3')(dense34)
+
+# #2.3 모델4
+# input4 = Input(shape=(timesteps, express_g_x.shape[1]))
+# conv41 = Conv1D(16, kernel_size=3, name='express1')(input4)
+# pool41 = MaxPooling1D(pool_size=1)(conv41)
+# flatten4 = Flatten()(pool41)
+# dense42 = Dense(128, activation='relu', name='express2')(flatten4)
+# drop41 = Dropout(0.125)(dense42)
+# dense43 = Dense(128, activation='relu', name='express3')(drop41)
+# drop42 = Dropout(0.125)(dense43)
+# dense44 = Dense(256, activation='relu', name='express4')(drop42)
+# output4 = Dense(23, name='output4')(dense44)

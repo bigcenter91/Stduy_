@@ -5,8 +5,8 @@ from sklearn.preprocessing import MinMaxScaler, StandardScaler, RobustScaler, Ma
 from sklearn.neighbors import LocalOutlierFactor
 
 # 훈련 데이터 및 테스트 데이터 로드
-path= "d:/study_data/_data/fac/"
-save_path=  "d:/study_data/_save/fac/"
+path= "c:/study_data/_data/fac/"
+save_path=  "c:/study_data/_save/fac/"
 train_data = pd.read_csv(path+'train_data.csv')
 test_data = pd.read_csv(path+'test_data.csv')
 submission = pd.read_csv(path+'answer_sample.csv')
@@ -25,7 +25,7 @@ print(train_data.columns)
 #       dtype='object')
 
 # Select subset of features for LOF model
-features = ['motor_current','motor_temp', 'out_pressure', 'motor_rpm']
+features = ['air_inflow', 'air_end_temp', 'out_pressure', 'motor_current', 'motor_rpm', 'motor_temp', 'motor_vibe']
 
 # Prepare train and test data
 X = train_data[features]
@@ -34,16 +34,16 @@ X = train_data[features]
 X_train, X_val = train_test_split(X, train_size= 0.8, random_state= 2222)
 
 # Normalize data
-scaler = RobustScaler()
+scaler = MinMaxScaler()
 X_train = scaler.fit_transform(X_train)
 X_val = scaler.transform(X_val)
 
 # Apply Local Outlier Factor
-lof = LocalOutlierFactor(n_neighbors=25, contamination=0.1)
+lof = LocalOutlierFactor(n_neighbors=20, contamination=0.1)
 y_pred_train = lof.fit_predict(X_train)
 
 # Tuning: Adjust the n_neighbors and contamination parameters
-lof_tuned = LocalOutlierFactor(n_neighbors=25, contamination=0.048)
+lof_tuned = LocalOutlierFactor(n_neighbors=20, contamination=0.048)
 y_pred_train_tuned = lof_tuned.fit_predict(X_train)
 
 # Predict anomalies in test data using tuned LOF
@@ -62,6 +62,8 @@ plt.show()
 
 submission['label'] = pd.DataFrame({'Prediction': lof_predictions})
 print(submission.value_counts())
+print(submission['label'].value_counts())
+
 #time
 date = datetime.datetime.now()
 date = date.strftime("%m%d_%H%M")
