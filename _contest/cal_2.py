@@ -1,6 +1,5 @@
 import numpy as np
 import pandas as pd
-from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense
 from sklearn.experimental import enable_halving_search_cv
 from sklearn.model_selection import train_test_split, KFold, GridSearchCV, RandomizedSearchCV, HalvingGridSearchCV, HalvingRandomSearchCV
@@ -10,10 +9,13 @@ import datetime
 import time
 from tensorflow.keras.callbacks import EarlyStopping
 from sklearn.ensemble import RandomForestRegressor
+from sklearn.gaussian_process import GaussianProcessRegressor
+from sklearn.gaussian_process.kernels import RBF
+
 
 
 #1 데이터
-path = "c:/study_data/_data/cal/"
+path= "c:/study_data/_data/cal/"
 save_path = 'c:/study_data/_save/cal/'
 
 train_csv = pd.read_csv(path + 'train.csv', index_col = 0)
@@ -53,12 +55,11 @@ test_csv = scaler.transform(test_csv)
 n_splits = 30
 kfold = KFold(n_splits = n_splits, shuffle = True, random_state = 3333)
 
-parameters = [{'n_estimators' : [100, 200], 'max_depth' : [6, 8, 10, 11]},
-              {'min_samples_leaf' : [3, 5, 7, 10], 'min_samples_split' : [2, 3, 5, 10], 'n_jobs' : [-1, 2, 3]},
-              {'n_estimators' : [100, 200], 'min_samples_split' : [2, 3, 5, 10], 'min_samples_leaf' : [3, 5, 7, 10]}
-              ]
+parameters = [{'kernel': [1.0 * RBF(1.0), 2.0 * RBF(2.0)],
+               'alpha': [1e-10, 1e-5, 1e-2, 1, 10, 100],
+               'length_scale': [1e-6, 1e-5, 1e-4, 1e-3, 1e-2]}]
 
-model = HalvingRandomSearchCV(RandomForestRegressor(),
+model = HalvingRandomSearchCV(GaussianProcessRegressor(),
                      parameters,
                      cv = 5,
                      verbose = 1,
@@ -89,3 +90,9 @@ submission = pd.read_csv(path + 'sample_submission.csv', index_col=0)
 submission['Calories_Burned'] = y_submit
 submission.to_csv(save_path + 'Cal' + date + '.csv')
 print("걸린시간 : ", round(end - start, 2),'초')
+
+
+# GaussianProcessRegressor
+# loss :  -2.119246222358624
+# RMSE :  107.78273207398917
+# 걸린시간 :  86.34 초
