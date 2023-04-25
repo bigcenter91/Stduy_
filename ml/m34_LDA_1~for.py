@@ -9,8 +9,6 @@ from sklearn.datasets import load_wine, fetch_covtype
 
 #1. 데이터
 
-
-
 diabetes_path = './_data/dacon_diabetes/'
 wine_path = './_data/dacon_wine/'
 
