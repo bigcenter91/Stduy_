@@ -3,11 +3,13 @@
 
 # m33_2 결과 뛰어넘기
 
-
 # n_jobs = -1
-#     tree_method = 'gpu_hist'
-#     predictor = 'gpu_predictor'
-#     gpu_id = 0
+#   tree_method = 'gpu_hist'
+#   predictor = 'gpu_predictor'
+#   gpu_id = 0,
+
+# pca는 y를 찾아내는 작업
+# 분해 전 스케일링 작업을 할 수 있는 것이다
 
 import numpy as np
 from xgboost import XGBClassifier
@@ -30,11 +32,11 @@ x = x.reshape(x.shape[0], -1)
 parameters = [
     {'n_estimators':[100, 200, 300], 'learning_rate':[0.1, 0.3, 0.001, 0.01],
      'max_depth':[4, 5, 6]},
-    {'n_estimators':[90, 100, 110], 'learning_rate':[0.1, 0.001, 0.01],
-     'max_depth':[4, 5, 6], 'colsample_bytree':[0.6, 0.9, 1]},
-    {'n_estimators':[90, 110], 'learning_rate':[0.1, 0.001, 0.01],
-     'max_depth':[4, 5, 6], 'colsample_bytree':[0.6, 0.9, 1],
-     'colsample_bylevel':[0.6, 0.7, 0.9]},
+    # {'n_estimators':[90, 100, 110], 'learning_rate':[0.1, 0.001, 0.01],
+    #  'max_depth':[4, 5, 6], 'colsample_bytree':[0.6, 0.9, 1]},
+    # {'n_estimators':[90, 110], 'learning_rate':[0.1, 0.001, 0.01],
+    #  'max_depth':[4, 5, 6], 'colsample_bytree':[0.6, 0.9, 1],
+    #  'colsample_bylevel':[0.6, 0.7, 0.9]},
 ]
 
 
@@ -42,12 +44,16 @@ for i in range(len(n_c_list)):
     pca = PCA(n_components=n_c_list[i])
     x_p = pca.fit_transform(x.astype('float32'))
     x_train, x_test, y_train, y_test = train_test_split(x_p, y, train_size=0.8, shuffle=True, random_state=123)
+    # pca 다음에 train_test_split 스케일링 하는 개념이다
 
-    model = GridSearchCV(XGBClassifier(tree_method='gpu_hist', predictor='gpu_predictor', gpu_id=0), parameters, cv=5, refit=True, n_jobs=-1)
+    model = GridSearchCV(XGBClassifier(tree_method='gpu_hist', predictor='gpu_predictor', gpu_id=0), parameters, cv=5, refit=True, n_jobs=-1, verbose=1)
     model.fit(x_train, y_train)
     
-    test_score = model.score(x_test, y_test)
-    print(f'PCA {pca_list[i]} test score : {test_score}')
+    acc = model.score(x_test, y_test)
+    print(f'PCA {pca_list[i]} test acc : {acc}')
     
-    y_pred = np.argmax(model.predict(x_test), axis=1)
-    print(f'PCA {pca_list[i]} pred acc :', accuracy_score(np.argmax(y_test, axis=1), y_pred))
+    y_pred = np.argmax(model.predict(x_test), axis=0)
+    print(f'PCA {pca_list[i]} pred acc :', accuracy_score(np.argmax(y_test, axis=0), y_pred))
+    
+
+# xgboost epoch는 n_estimators
