@@ -33,7 +33,7 @@ model_name_list = ['LinearSVC : ',
 
 
 #2. 모델
-for i, v in enumerate(data_list): # i = 인덱스값 순서, v = 데이터값, enumerate
+for i, v in enumerate(data_list): # i = 인덱스값 순서, v = 데이터값, enumerate = 순서대로 반환
     x, y = v
     print(v)
     # print(x.shape, y.shape)
