@@ -22,23 +22,22 @@ x_test = scaler.transform(x_test)
 n_splits = 5
 kfold = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=337)
 
-# parameters = {'n_estimators' : [100, 200, 300, 400, 500, 1000] 디폴트 100 / 1~inf / 정수
+# parameters = {'n_estimators' : [100, 200, 300, 400, 500, 1000] 디폴트 100 / 1~inf / 정수 : epochs
 #               'learning_rate' : [0.1, 0.2, 0.3, 0.5, 1, 0.01, 0.001] 디폴트 0.3 / 0~1 / eta
-#               'max_depth' : [None, 2, 3, 4, 5, 6, 7, 8, 9, 10] 디폴트 6 / 0~inf / 정수
+#               'max_depth' : [None, 2, 3, 4, 5, 6, 7, 8, 9, 10] 디폴트 6 / 0~inf / 정수 : 최대의 깊이를 잡겠다 / 3~7정도가 잘먹힌다
 #               'gamma' : [0, 1, 2, 3, 4, 5, 6, 7, 8 ,9 ,10, 100] 디폴트 0 / 0~inf
-#               'min_child_weight' : [0, 0.01, 0.001, 0.1, 0.5, 1, 5, 10, 100] 디폴트 1 / 0~inf
-#               'subsample' : [0.1, 0.2, 0.3, 0.5, 0.7, 1] 디폴트 1 / 0~1
+#               'min_child_weight' : [0, 0.01, 0.001, 0.1, 0.5, 1, 5, 10, 100] 디폴트 1 / 0~inf : 최소의 
+#               'subsample' : [0.1, 0.2, 0.3, 0.5, 0.7, 1] 디폴트 1 / 0~1 : 데이터의 훈련 시키는 양 ex) 0.8이면 80%의 양으로 훈련 시키겠다
 #               'colsample_bytree' : [0, 0.1, 0.2, 0.3, 0.5, 0.7, 1]디폴트 1 / 0~1
 #               'colsample_bylevel' : [0, 0.1, 0.2, 0.3, 0.5, 0.7, 1]디폴트 1 / 0~1
 #               'colsample_bynode' : [0, 0.1, 0.2, 0.3, 0.5, 0.7, 1]디폴트 1 / 0~1
-#               'reg_alpha' : [0, 0.1, 0.01, 0.001, 1, 2, 10]디폴트 0 / 0~inf / L1 절대값 가중치 규제 / alpha
-#               'reg_lambda' : [0, 0.1, 0.01, 0.001, 1, 2, 10] 디폴트 1 / 0~inf / L2 제곱 가중치 규제 / lambda
-#               }
+#               'reg_alpha' : [0, 0.1, 0.01, 0.001, 1, 2, 10]디폴트 0 / 0~inf / L1 절대값 가중치 규제 / alpha_라쏘
+#               'reg_lambda' : [0, 0.1, 0.01, 0.001, 1, 2, 10] 디폴트 1 / 0~inf / L2 제곱 가중치 규제 / lambda_리지
+#               } reg_alpha/ lambda 레이어에 양수로 떨어뜨리겠다
 
 
-
-parameters = {'n_estimators' : [100],
-              'learning_rate' : [0.1],
+parameters = {'n_estimators' : [1000],
+              'learning_rate' : [0.1, 0.2, 0.3, 0.5, 1, 0.001],
               'max_depth' : [3],
               'gamma' : [1],
               'min_child_weight' : [1],

@@ -9,3 +9,4 @@ outliers = EllipticEnvelope(contamination=.1) # 전체 데이터 중에 몇프�
 outliers.fit(aaa)
 results = outliers.predict(aaa)
 print(results) # [ 1  1  1  1  1  1 -1  1  1  1  1  1 -1] -1이 이상치라는걸 알 수 있다
+
