@@ -14,21 +14,42 @@ print(sk.__version__) #1.2.2
 
 
 #1. 데이터 
-path = './_data/dacon_diabetes/'
-path_save = './_save/dacon_diabetes/'
+path = 'c:/stduy_/_data/dacon_wine/'
+path_save = 'c:/stduy_/_save/dacon_wine/'
 
-train_csv= pd.read_csv(path+'train.csv', index_col=0)
-print(train_csv)  
-# [652 rows x 9 columns] #(652,9)
+train_csv = pd.read_csv(path + 'train.csv', index_col=0)
+print(train_csv) #[5497 rows x 13 columns]
+print(train_csv.shape) #(5497,13)
+ 
+test_csv = pd.read_csv(path + 'test.csv', index_col=0)
+print(test_csv) #[1000 rows x 12 columns] / quality 제외 (1열)
 
-test_csv= pd.read_csv(path+'test.csv', index_col=0)
-print(test_csv) 
-#(116,8) #outcome제외
+#labelencoding
+from sklearn.preprocessing import LabelEncoder
+le = LabelEncoder()
+le.fit(train_csv['type'])
+aaa = le.transform(train_csv['type'])
+print(aaa)   #[1 0 1 ... 1 1 1]
+print(type(aaa))  #<class 'numpy.ndarray'>
+print(aaa.shape)
+print(np.unique(aaa, return_counts=True))
 
-# print(train_csv.isnull().sum()) #결측치 없음
+train_csv['type'] = aaa
+test_csv['type'] = le.transform(test_csv['type'])
 
-x = train_csv.drop(['Outcome'], axis=1)
-y = train_csv['Outcome']
+x = train_csv.drop(['quality'], axis=1)
+print(x.shape)                       #(5497, 12)
+y = train_csv['quality']
+
+#1-2 one-hot-encoding
+print('y의 라벨값 :', np.unique(y))  #[3 4 5 6 7 8 9]
+print(np.unique(y, return_counts=True)) # array([  26,  186, 1788, 2416,  924,  152, 5]
+
+import pandas as pd
+y=pd.get_dummies(y)
+y = np.array(y)
+print(y.shape)                       #(5497, 7)
+
 
 x_train, x_test, y_train, y_test = train_test_split(
     x, y, random_state=337, train_size=0.8, #stratify=y
@@ -52,6 +73,7 @@ parameters = {'n_estimators' : 10000,
               'random_state' : 123,
             #   'eval_metric' : 'error'
               }
+
 
 #2. 모델
 model = XGBClassifier(**parameters)

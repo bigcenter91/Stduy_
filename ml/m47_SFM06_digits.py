@@ -1,5 +1,4 @@
 import numpy as np
-import pandas as pd
 from sklearn.datasets import load_breast_cancer, load_iris, load_wine, fetch_covtype, load_digits
 from sklearn.model_selection import KFold, StratifiedKFold
 from sklearn.model_selection import train_test_split
@@ -14,21 +13,7 @@ print(sk.__version__) #1.2.2
 
 
 #1. 데이터 
-path = './_data/dacon_diabetes/'
-path_save = './_save/dacon_diabetes/'
-
-train_csv= pd.read_csv(path+'train.csv', index_col=0)
-print(train_csv)  
-# [652 rows x 9 columns] #(652,9)
-
-test_csv= pd.read_csv(path+'test.csv', index_col=0)
-print(test_csv) 
-#(116,8) #outcome제외
-
-# print(train_csv.isnull().sum()) #결측치 없음
-
-x = train_csv.drop(['Outcome'], axis=1)
-y = train_csv['Outcome']
+x, y = load_digits(return_X_y=True)
 
 x_train, x_test, y_train, y_test = train_test_split(
     x, y, random_state=337, train_size=0.8, #stratify=y
@@ -55,7 +40,7 @@ parameters = {'n_estimators' : 10000,
 
 #2. 모델
 model = XGBClassifier(**parameters)
-model.set_params(early_stopping_rounds =100, eval_metric = 'error', **parameters)    
+model.set_params(early_stopping_rounds =100, eval_metric = 'merror', **parameters)    
 
 
 # train the model
@@ -89,7 +74,7 @@ for i in thresholds:
 
     selection_model = XGBClassifier()
 
-    selection_model.set_params(early_stopping_rounds =10, eval_metric = 'error', **parameters)
+    selection_model.set_params(early_stopping_rounds =10, eval_metric = 'merror', **parameters)
 
     selection_model.fit(select_x_train, y_train,
                         eval_set = [(select_x_train, y_train), (select_x_test, y_test)],
