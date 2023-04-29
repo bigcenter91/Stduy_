@@ -54,7 +54,7 @@ train_y = train['Delay_num']
 test_x = test.drop(columns=['ID'])
 
 # Split the training dataset into a training set and a validation set
-train_x, val_x, train_y, val_y = train_test_split(train_x, train_y, test_size=0.2, random_state=42)
+train_x, val_x, train_y, val_y = train_test_split(train_x, train_y, test_size=0.2, random_state=3377)
 
 # Normalize numerical features
 scaler = StandardScaler()
@@ -63,13 +63,13 @@ val_x = scaler.transform(val_x)
 test_x = scaler.transform(test_x)
 
 # Cross-validation with StratifiedKFold
-cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=3377)
 
 # Model and hyperparameter tuning using GridSearchCV
-model = XGBClassifier(random_state=42)
+model = XGBClassifier(random_state=3377)
 
 param_grid = {
-    'learning_rate': [0.8, 0.5],
+    'learning_rate': [0.8, 0.5, 0.0005],
     'max_depth': [2, 6],
     'n_estimators': [100, 900],
 }
@@ -100,10 +100,9 @@ print('F1 Score:f1',f1)
 
 y_pred = best_model.predict_proba(test_x)
 submission = pd.DataFrame(data=y_pred, columns=sample_submission.columns, index=sample_submission.index)
-submission.to_csv('c:/study_data/_data/dacon_airplane/submission.csv')
-
+submission.to_csv('c:/study_data/_save/dacon_airplane/submission.csv')
+# submission.to_csv(save_path + date + 'submission.csv', index=False)
 
 # date = datetime.datetime.now()
 # date = date.strftime("%m%d_%H%M")
 
-# submission.to_csv(save_path + date + 'submission.csv', index=False)
