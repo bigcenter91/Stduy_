@@ -10,7 +10,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.datasets import load_iris, load_breast_cancer, load_diabetes, load_digits
 from sklearn.datasets import load_wine, fetch_covtype
-
+ 
 #1. 데이터
 
 diabetes_path = './_data/dacon_diabetes/'
