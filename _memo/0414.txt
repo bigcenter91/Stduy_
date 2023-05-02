@@ -1,0 +1,16 @@
+다다음 주쯤 텐서1을 할거야
+
+
+01_iris
+02_cancer
+03_dacon_diabets
+04_wine
+05_fetch_covtype
+06_digits
+
+08_boston
+09_california
+10_ddarung
+11_kaggle_bike
+오후 12:04 2023-04-15
+Ai_Factory 토/일 3개씩 올려

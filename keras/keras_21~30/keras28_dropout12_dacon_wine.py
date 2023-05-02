@@ -66,7 +66,7 @@ x_train, x_test, y_train, y_test = train_test_split(
     x, y, shuffle=True, train_size=0.8, random_state=444
 )
 
-scaler = MinMaxScaler()
+scaler = RobustScaler()
 x_train = scaler.fit_transform(x_train)
 x_test = scaler.transform(x_test)
 test_csv = scaler.transform(test_csv)
@@ -97,7 +97,7 @@ model.compile(loss = 'categorical_crossentropy', optimizer='adam',
 es = EarlyStopping(monitor='val_loss', patience=500, mode='min',
                    verbose=1, restore_best_weights=True)
 
-model.fit(x_train, y_train, epochs=1000, batch_size=5,
+model.fit(x_train, y_train, epochs=50, batch_size=5,
           validation_split=0.2,
           verbose=1, callbacks=[es])
 
@@ -125,4 +125,4 @@ y_submit+=3 # 라벨 값하고 맞춰줄려고
 
 submission['quality'] = y_submit
 
-submission.to_csv(path_save + 'submit_0314_1758.csv')
+submission.to_csv(path_save + 'submit_0428_1225.csv')

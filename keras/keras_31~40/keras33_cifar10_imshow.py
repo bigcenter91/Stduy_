@@ -54,13 +54,13 @@ model.summary() # 요약하여 출력
 
 model.compile(loss = 'categorical_crossentropy', optimizer='adam', metrics='acc')
 
-es = EarlyStopping(monitor='val_loss', patience=10, mode='max',
+es = EarlyStopping(monitor='val_loss', patience=20, mode='max',
                    verbose=1, restore_best_weights=True)
 
 import time
 start_time = time.time()
 
-hist = model.fit(x_train, y_train, epochs=50, batch_size=2000,
+hist = model.fit(x_train, y_train, epochs=100, batch_size=2000,
                  validation_split=0.2, verbose=1, callbacks=[es])
 
 end_time = time.time()

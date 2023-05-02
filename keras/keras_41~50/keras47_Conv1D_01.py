@@ -15,4 +15,4 @@ model.add(Dense(1))
 
 model.summary()
 # Cov1이 속도가 훨씬 빠르다 연산량이 적기 때문에
-3차원 데이터 Conv1D/ 
+# 3차원 데이터 Conv1D

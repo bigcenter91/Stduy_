@@ -49,3 +49,41 @@ df = df.dropna()
 
 # 독립 변수와 종속 변수 분리
 ; X = df[['temp1', 'temp2
+          
+          
+          # 1. 데이터
+
+path = "d:/study_data/_data/project_p/"
+save_path = "d:/study_data/_save/project_p/"
+
+weather_g_21 = pd.read_csv(path + 'OBS_212208_Gwangju weather_2021.csv', index_col=0, encoding='cp949')
+weather_g_22 = pd.read_csv(path + 'OBS_212208_Gwangju weather_2022.csv', index_col=0, encoding='cp949')
+weather_j_21 = pd.read_csv(path + 'OBS_212208_Jeonju weather_2021.csv', index_col=0, encoding='cp949')
+weather_j_22 = pd.read_csv(path + 'OBS_212208_Jeonju weather_2022.csv', index_col=0, encoding='cp949')
+weather_m_21 = pd.read_csv(path + 'OBS_212208_Mokpo weather_2021.csv', index_col=0, encoding='cp949')
+weather_m_22 = pd.read_csv(path + 'OBS_212208_Mokpo weather_2022.csv', index_col=0, encoding='cp949')
+rice_k_21 = pd.read_csv(path + '2122_Rice production_polished rice_2021.csv', index_col=0, encoding='cp949')
+rice_k_22 = pd.read_csv(path + '2122_Rice production_polished rice_2022.csv', index_col=0, encoding='cp949')
+
+# 2. 데이터 전처리
+
+# 각 지역별로 날씨 데이터를 결합합니다.
+weather_g = pd.concat([weather_g_21, weather_g_22], axis=0)
+weather_j = pd.concat([weather_j_21, weather_j_22], axis=0)
+weather_m = pd.concat([weather_m_21, weather_m_22], axis=0)
+
+# 날짜 데이터를 인덱스로 변경합니다.
+weather_g.index = pd.to_datetime(weather_g.index)
+weather_j.index = pd.to_datetime(weather_j.index)
+weather_m.index = pd.to_datetime(weather_m.index)
+
+# 각 지역별로 날씨 데이터를 8월로 필터링합니다.
+weather_g = weather_g[weather_g.index.month == 8]
+weather_j = weather_j[weather_j.index.month == 8]
+weather_m = weather_m[weather_m.index.month == 8]
+
+# 각 지역별로 불필요한 컬럼을 제거합니다.
+weather_g.drop(['최저기온(°C)', '최고기온(°C)', '10분 최다 강수량(mm)', '1시간 최다강수량(mm)', '일강수량(mm)',
+                 '최대 순간 풍속(m/s)', '최대 풍속(m/s)', '평균 풍속(m/s)', '평균 이슬점온도(°C)'], axis=1, inplace=True)
+weather_j.drop(['최저기온(°C)', '최고기온(°C)', '10분 최다 강수량(mm)', '1시간 최다강수량(mm)', '일강수량(mm)',
+                 '최대 순간 풍속(m

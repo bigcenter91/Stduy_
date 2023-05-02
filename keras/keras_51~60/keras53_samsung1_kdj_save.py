@@ -141,9 +141,9 @@ loss = model.evaluate([samsung_x_test_split, hyundai_x_test_split], [samsung_y_t
 print('loss : ', loss)
 
 samsung_x_predict = samsung_x_test[-timesteps:]
-print(samsung_x_predict.shape)
+print(samsung_x_predict.shape) # (20, 14)
 samsung_x_predict = samsung_x_predict.reshape(1, timesteps, 14)
-print(samsung_x_predict.shape)
+print(samsung_x_predict.shape) # (1, 20, 14)
 
 hyundai_x_predict = hyundai_x_test[-timesteps:]
 hyundai_x_predict = hyundai_x_predict.reshape(1, timesteps, 14)
