@@ -19,7 +19,7 @@ def split_month_day_hour(DataFrame:pd.DataFrame)->pd.DataFrame:
 def Imputation(DataFrame:pd.DataFrame)->pd.DataFrame:
     imputer=IterativeImputer(XGBRegressor(tree_method='gpu_hist',
                     predictor='gpu_predictor',
-                    gpu_id=0,n_estimators=1000,learning_rate=0.01,subsample=1,
+                    gpu_id=0,n_estimators=1000,learning_rate=0.001,subsample=1,
                     max_depth=8))
     DataFrame=pd.DataFrame(imputer.fit_transform(DataFrame),columns=DataFrame.columns)
     DataFrame=DataFrame.interpolate()
