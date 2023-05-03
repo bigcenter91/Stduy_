@@ -19,7 +19,6 @@ models = [RandomForestRegressor(),DecisionTreeRegressor(),
 
 scaler = MinMaxScaler()
 
-# Loop through the datasets and models, fit the models, and print the results
 for i, dataset in enumerate(datasets):
     x, y = dataset
     x = scaler.fit_transform(x)
