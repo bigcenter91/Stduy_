@@ -61,7 +61,7 @@ pf = PolynomialFeatures(degree=2)
 train_x = pf.fit_transform(train_x)
 
 # Split the training dataset into a training set and a validation set
-train_x, val_x, train_y, val_y = train_test_split(train_x, train_y, test_size=0.2, random_state=33)
+train_x, val_x, train_y, val_y = train_test_split(train_x, train_y, test_size=0.2, random_state=447)
 
 # Normalize numerical features
 # scaler = StandardScaler()
@@ -70,7 +70,7 @@ train_x, val_x, train_y, val_y = train_test_split(train_x, train_y, test_size=0.
 # test_x = scaler.transform(test_x)
 
 # Cross-validation with StratifiedKFold
-cv = StratifiedKFold(n_splits=10, shuffle=True, random_state=33)
+cv = StratifiedKFold(n_splits=10, shuffle=True, random_state=447)
 
 # Model and hyperparameter tuning using GridSearchCV
 model = XGBClassifier(random_state=33,
@@ -108,4 +108,4 @@ print('F1 Score:f1',f1)
 
 y_pred = best_model.predict_proba(test_x)
 submission = pd.DataFrame(data=y_pred, columns=sample_submission.columns, index=sample_submission.index)
-submission.to_csv('c:/study_data/_save/dacon_airplane/050201submission.csv', float_format='%.3f')
+submission.to_csv('c:/study_data/_save/dacon_airplane/0504201submission.csv', float_format='%.3f')
