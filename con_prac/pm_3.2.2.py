@@ -350,16 +350,17 @@ rl = ReduceLROnPlateau(
 
 for i in range(72):
     globals()['model{}'.format(i+1)] = Sequential()
-    globals()['model{}'.format(i+1)].add(LSTM(32, input_shape=(timesteps, x1_train.shape[2])))
-    globals()['model{}'.format(i+1)].add(Dense(32, activation='relu'))
+    globals()['model{}'.format(i+1)].add(LSTM(16, input_shape=(timesteps, x1_train.shape[2])))
     globals()['model{}'.format(i+1)].add(Dense(8, activation='relu'))
+    globals()['model{}'.format(i+1)].add(Dense(4, activation='relu'))
+    globals()['model{}'.format(i+1)].add(Dense(2, activation='relu'))
     globals()['model{}'.format(i+1)].add(Dense(1))
     globals()['model{}'.format(i+1)].compile(loss='mae', optimizer='adam')
     
     globals()['model{}'.format(i+1)].fit(
         globals()['x{}_train'.format(i+1)], globals()['y{}_train'.format(i+1)],
         batch_size=1024,
-        epochs=50,
+        epochs=100,
         callbacks=[es,rl],
         validation_split=0.2)
     print(f'{i}번쨰 훈련 완료')
@@ -401,7 +402,7 @@ print('# 5.1 Done')
 l = np.array(l).reshape(-1,)
 l = np.round(l/0.004)*0.004
 submission['PM2.5']=l
-submission.to_csv('c:/study_data/_save/dust/_Submit_time05091.csv')
+submission.to_csv('c:/study_data/_save/dust/_Submit_time050922.csv')
 
 print('# 5.2 Done')
 
