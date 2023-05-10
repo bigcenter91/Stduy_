@@ -18,15 +18,11 @@ from lightgbm import LGBMRegressor
 import tensorflow as tf
 import glob
 import random
+import datetime
 
-# 0. Set random seed
-seed = 0
-random.seed(seed)
-np.random.seed(seed)
-tf.random.set_seed(seed)
-os.environ["PYTHONHASHSEED"] = str(seed)
+date = datetime.datetime.now()
+date = date.strftime('%m%d_%H%M%S')
 
-# 0. gpu 사용여부
 gpus = tf.config.experimental.list_physical_devices('GPU')
 if gpus:
     try:
@@ -36,14 +32,25 @@ if gpus:
     except RuntimeError as e:
         print(e)        
 
+
+# 0. Set random seed
+seed = 0
+random.seed(seed)
+np.random.seed(seed)
+tf.random.set_seed(seed)
+os.environ["PYTHONHASHSEED"] = str(seed)
+
+
+
 # 1.0 train, test, answer 데이터 경로 지정 및 가져오기
 path = 'c:/study_data/_data/finedust/'
+path_save = 'c:/study_data/_save/dust/'
 
 train_pm_path = glob.glob(path + 'TRAIN/*.csv')
 test_pm_path = glob.glob(path + 'TEST_INPUT/*.csv')
 train_aws_path = glob.glob(path + 'TRAIN_AWS/*.csv')
 test_aws_path = glob.glob(path + 'TEST_AWS/*.csv')
-submission = pd.read_csv('c:/study_data/_data/finedust/answer_sample.csv', index_col=0)
+submission = pd.read_csv(path + 'answer_sample.csv', index_col=0)
 
 from preprocess_3 import bring
 train_pm = bring(train_pm_path)
@@ -66,12 +73,18 @@ test_aws['지점'] = label.transform(test_aws['지점'].ffill())
 print('# 1.1 Done')
 
 
+
 # 1.2 hour 열 생성 (주기 함수로) & 연도, 일시 열 제거
 from preprocess_3 import get_hourly_features
+
+train_pm['month'] = train_pm['일시'].str[:2].astype('int8')
 
 train_pm['hour'] = train_pm['일시'].str[6:8].astype('int8')
 train_pm['hour_sin'], train_pm['hour_cos'] = get_hourly_features(train_pm['hour'])
 train_pm = train_pm.drop(['연도', '일시', 'hour'], axis=1)
+
+
+test_pm['month'] = test_pm['일시'].str[:2].astype('int8')
 
 test_pm['hour'] = test_pm['일시'].str[6:8].astype('int8')
 test_pm['hour_sin'], test_pm['hour_cos'] = get_hourly_features(test_pm['hour'])
@@ -81,6 +94,7 @@ train_aws = train_aws.drop(['연도', '일시'], axis=1)
 test_aws = test_aws.drop(['연도', '일시'], axis=1)
 
 print('# 1.2 Done')
+
 
 
 # 1.3 train_pm/aws 결측치 제거 ( imputer )
@@ -99,6 +113,45 @@ train_aws['강수량(mm)'] = imputer.fit_transform(train_aws['강수량(mm)'].va
 train_aws['습도(%)'] = imputer.fit_transform(train_aws['습도(%)'].values.reshape(-1 , 1)).reshape(-1,)
 
 print('# 1.3 Done')
+
+
+
+# 1.4 KMeans로 month k_month 개로 군집화
+month_pm_mean = []
+month_pm_std = []
+for i in range(12):
+    month = []
+    for j in range(len(train_pm['month'])):
+        if train_pm['month'][j] == i+1:
+            month.append(train_pm['PM2.5'][j])
+    print(f'{i+1}월 평균 : ', np.mean(month), f'{i+1}월의 표준편차 : ', np.std(month))
+    month_pm_mean.append(np.mean(month))
+    month_pm_std.append(np.std(month))
+
+from sklearn.cluster import KMeans
+
+month_pm_mean = np.array(month_pm_mean).reshape(-1, 1)
+month_pm_std = np.array(month_pm_std).reshape(-1, 1)
+cluster_month = np.concatenate([month_pm_mean, month_pm_std], axis=1)
+
+k_month = 4
+
+kmeans = KMeans(n_clusters=k_month, init='k-means++', max_iter=300, n_init=10, random_state=seed)
+kmeans.fit(cluster_month)
+labels_month = kmeans.labels_
+
+print('# 1.4 Done')
+
+
+
+# 1.5 kMeans의 label값 원핫인코딩
+from tensorflow.keras.utils import to_categorical
+
+labels_month = to_categorical(labels_month)
+
+print('# 1.5 Done')
+
+
 
 
 
@@ -169,7 +222,6 @@ train_pm_aws = []
 for i in range(17):
     train_pm_aws.append(train_aws[min_i[i, 0], :, 1:]*result[0, 0] + train_aws[min_i[i, 1], :, 1:]*result[0, 1] + train_aws[min_i[i, 2], :, 1:]*result[0, 2])
 train_pm_aws = np.array(train_pm_aws)
-print(train_pm_aws.shape)
 
 test_pm_aws = []
 for i in range(17):
@@ -189,48 +241,69 @@ print('# 2.6 Done')
 
 
 
-# 2.7 KMeans로 지역 k 개로 군집화
-from sklearn.cluster import KMeans
+# 2.7 KMeans로 지역 k_location 개로 군집화
+pm_loc_means = [np.mean(train_pm[i, :, 0]) for i in range(17)]
+pm_loc_std = [np.std(train_pm[i, :, 0]) for i in range(17)]
+cluster_loc = np.array(list(zip(pm_loc_means, pm_loc_std)))
 
-pm_means = [np.mean(train_pm[i, :, 0]) for i in range(17)]
-pm_std = [np.std(train_pm[i, :, 0]) for i in range(17)]
-cluster = np.array(list(zip(pm_means, pm_std)))
+k_location = 3
 
-k = 3
-
-kmeans = KMeans(n_clusters=k, init='k-means++', max_iter=300, n_init=10, random_state=seed)
-kmeans.fit(cluster)
-centroids = kmeans.cluster_centers_
-labels = kmeans.labels_
+kmeans = KMeans(n_clusters=k_location, init='k-means++', max_iter=300, n_init=10, random_state=seed)
+kmeans.fit(cluster_loc)
+labels_loc = kmeans.labels_
 
 print('# 2.7 Done')
 
 
 
 # 2.8 kMeans의 label값 원핫인코딩
-from tensorflow.keras.utils import to_categorical
-
-labels = to_categorical(labels)
+labels_loc = to_categorical(labels_loc)
 
 print('# 2.8 Done')
 
 
 
 # 2.9 데이터 준비
-train_pm_onehot = []
+train_pm_loc_onehot = []
 for i in range(17):
     for j in range(train_pm.shape[1]):
-        train_pm_onehot.append(np.concatenate([train_pm[i, j, :], labels[i, :]]))
+        train_pm_loc_onehot.append(np.concatenate([train_pm[i, j, :], labels_loc[i, :]]))
         
-train_pm_onehot = np.array(train_pm_onehot).reshape(17, -1, train_pm.shape[2]+k)
-train_data = np.concatenate([train_pm_onehot, train_pm_aws], axis=2)
+train_pm_loc_onehot = np.array(train_pm_loc_onehot).reshape(17, -1, train_pm.shape[2]+k_location)
 
-test_pm_onehot = []
+train_pm_month_onehot = []
+for i in range(17):
+    for j in range(train_pm_loc_onehot.shape[1]):
+        for k in range(12):
+            if train_pm_loc_onehot[i, j, 1] == k+1:
+                train_pm_month_onehot.append(np.concatenate([train_pm_loc_onehot[i, j, :], labels_month[k, :]]))
+        
+train_pm_month_onehot = np.array(train_pm_month_onehot).reshape(17, -1, train_pm_loc_onehot.shape[2]+k_month)
+
+train_data = np.concatenate([train_pm_month_onehot, train_pm_aws], axis=2)
+
+train_data = np.delete(train_data, 1, axis=2)
+
+
+
+
+test_pm_loc_onehot = []
 for i in range(17):
     for j in range(test_pm.shape[1]):
-        test_pm_onehot.append(np.concatenate([test_pm[i, j, :], labels[i, :]]))
+        test_pm_loc_onehot.append(np.concatenate([test_pm[i, j, :], labels_loc[i, :]]))
 
-test_pm_onehot = np.array(test_pm_onehot).reshape(17, -1, test_pm.shape[2]+k)
+test_pm_loc_onehot = np.array(test_pm_loc_onehot).reshape(17, -1, test_pm.shape[2]+k_location)
+
+test_pm_month_onehot = []
+for i in range(17):
+    for j in range(test_pm_loc_onehot.shape[1]):
+        for k in range(12):
+            if test_pm_loc_onehot[i, j, 1] == k+1:
+                test_pm_month_onehot.append(np.concatenate([test_pm_loc_onehot[i, j, :], labels_month[k, :]]))
+
+test_pm_month_onehot = np.array(test_pm_month_onehot).reshape(17, -1, test_pm_loc_onehot.shape[2]+k_month)
+
+test_pm_month_onehot = np.delete(test_pm_month_onehot, 1, axis=2)
 
 print('# 2.9 Done')
 
@@ -244,8 +317,8 @@ print('# 2.9 Done')
 
 # train_data 의 열 ( 훈련 시킬 x값 )
 # pm열 + onehot의 열 + pm_aws의 열
-# [(측정소) PM2.5 (month) (hour) hour_sin hour_cos] + [ onehot_1, onehot_2, onehot_3 ] + [(지역) 기온 풍향 풍속 강수량 습도] = ( None, 11 )
-#             0                     1        2             3         4         5                  6   7    8    9    10
+# [(측정소) PM2.5 (month) (hour) hour_sin hour_cos] + month 원핫 4개 + loc 원핫 3개 + [(지역) 기온 풍향 풍속 강수량 습도] = ( None, 15 )
+#             0                     1        2          3 4 5 6          7 8 9               10  11   12   13    14
 
 pm_col_num = 0
 
@@ -263,11 +336,11 @@ pm_col_num = 0
 
 
 # 3.1 split_x
-timesteps = 8
+timesteps = 6
 
 from preprocess_3 import split_x
 for i in range(72):
-    globals()['x{}'.format(i+1)] = split_x(train_data, timesteps, i).reshape(-1, timesteps, train_data.shape[2])
+    globals()[f'x{i+1}'] = split_x(train_data, timesteps, i).reshape(-1, timesteps, train_data.shape[2])
 
 print('# 3.1 Done')
 
@@ -275,10 +348,10 @@ print('# 3.1 Done')
 
 # 3.2 split_y
 for i in range(72):
-    globals()['y{}'.format(i+1)] = []
+    globals()[f'y{i+1}'] = []
     for j in range(train_data.shape[0]):
-        globals()['y{}'.format(i+1)].append(train_data[j, timesteps+i:, pm_col_num].reshape(-1,))
-    globals()['y{}'.format(i+1)] = np.array(globals()['y{}'.format(i+1)]).reshape(-1,)
+        globals()[f'y{i+1}'].append(train_data[j, timesteps+i:, pm_col_num].reshape(-1,))
+    globals()[f'y{i+1}'] = np.array(globals()[f'y{i+1}']).reshape(-1,)
 
 print('# 3.2 Done')
 
@@ -286,36 +359,21 @@ print('# 3.2 Done')
 
 # 3.3 train_test_split
 for i in range(72):
-    globals()['x{}_train'.format(i+1)], globals()['x{}_test'.format(i+1)], globals()['y{}_train'.format(i+1)], globals()['y{}_test'.format(i+1)] = train_test_split(globals()['x{}'.format(i+1)], globals()['y{}'.format(i+1)], train_size=0.7, random_state=seed, shuffle=True)
+    globals()[f'x{i+1}_train'], globals()[f'x{i+1}_test'], globals()[f'y{i+1}_train'], globals()[f'y{i+1}_test'] = train_test_split(globals()[f'x{i+1}'], globals()[f'y{i+1}'], train_size=0.7, random_state=seed, shuffle=True)
 
 print('# 3.3 Done')
 
 
 
-# 3.4 Scaler
-# scaler = MinMaxScaler()
 
-# for i in range(72):
-#     globals()['x{}_train'.format(i+1)] = globals()['x{}_train'.format(i+1)].reshape(-1, globals()['x{}'.format(i+1)].shape[2])
-#     globals()['x{}_test'.format(i+1)] = globals()['x{}_test'.format(i+1)].reshape(-1, globals()['x{}'.format(i+1)].shape[2])
-
-#     globals()['x{}_train'.format(i+1)][:, pm_col_num+3:], globals()['x{}_test'.format(i+1)][:, pm_col_num+3:] = scaler.fit_transform(globals()['x{}_train'.format(i+1)][:, pm_col_num+3:]), scaler.transform(globals()['x{}_test'.format(i+1)][:, pm_col_num+3:])
-
-# test_pm_aws = scaler.transform(test_pm_aws.reshape(-1, test_pm_aws.shape[2])).reshape(-1, timesteps, test_pm_aws.shape[2])
-
+# 3.4 데이터 용량 줄이기 ( float 64 -> float 32 )
+for i in range(72):
+    globals()[f'x{i+1}_train']=globals()[f'x{i+1}_train'].reshape(-1, timesteps, globals()[f'x{i+1}'].shape[2]).astype(np.float32)
+    globals()[f'x{i+1}_test']=globals()[f'x{i+1}_test'].reshape(-1, timesteps, globals()[f'x{i+1}'].shape[2]).astype(np.float32)
+    globals()[f'y{i+1}_train']=globals()[f'y{i+1}_train'].astype(np.float32)
+    globals()[f'y{i+1}_test']=globals()[f'y{i+1}_test'].astype(np.float32)
 
 print('# 3.4 Done')
-
-
-
-# 3.5 데이터 용량 줄이기 ( float 64 -> float 32 )
-for i in range(72):
-    globals()['x{}_train'.format(i+1)]=globals()['x{}_train'.format(i+1)].reshape(-1, timesteps, globals()['x{}'.format(i+1)].shape[2]).astype(np.float32)
-    globals()['x{}_test'.format(i+1)]=globals()['x{}_test'.format(i+1)].reshape(-1, timesteps, globals()['x{}'.format(i+1)].shape[2]).astype(np.float32)
-    globals()['y{}_train'.format(i+1)]=globals()['y{}_train'.format(i+1)].astype(np.float32)
-    globals()['y{}_test'.format(i+1)]=globals()['y{}_test'.format(i+1)].astype(np.float32)
-
-print('# 3.5 Done')
 
 
 
@@ -351,20 +409,19 @@ rl = ReduceLROnPlateau(
 
 
 for i in range(72):
-    globals()['model{}'.format(i+1)] = Sequential()
-    globals()['model{}'.format(i+1)].add(LSTM(32, input_shape=(timesteps, x1_train.shape[2])))
-    globals()['model{}'.format(i+1)].add(Dense(64, activation='relu'))
-    globals()['model{}'.format(i+1)].add(Dense(32, activation='relu'))
-    globals()['model{}'.format(i+1)].add(Dense(1))
-    globals()['model{}'.format(i+1)].compile(loss='mae', optimizer='adam')
-    
-    globals()['model{}'.format(i+1)].fit(
-        globals()['x{}_train'.format(i+1)], globals()['y{}_train'.format(i+1)],
+    globals()[f'model{i+1}'] = Sequential()
+    globals()[f'model{i+1}'].add(LSTM(32, input_shape=(timesteps, x1_train.shape[2])))
+    globals()[f'model{i+1}'].add(Dense(32, activation='relu'))
+    globals()[f'model{i+1}'].add(Dense(16, activation='relu'))
+    globals()[f'model{i+1}'].add(Dense(1))
+    globals()[f'model{i+1}'].compile(loss='mae', optimizer='adam')    
+    globals()[f'model{i+1}'].fit(
+        globals()[f'x{i+1}_train'], globals()[f'y{i+1}_train'],
         batch_size=1024,
         epochs=50,
         callbacks=[es,rl],
-        validation_split=0.25)
-    print(f'{i}번쨰 훈련 완료')
+        validation_split=0.2)
+    print(f'{i}번째 훈련 완료')
 
 print('# 4.1 Done')
 
@@ -375,22 +432,17 @@ print('# 4.1 Done')
 
 
 
-print(test_pm_onehot[0, 120*0+48-timesteps:120*0+48, :])
-print(test_pm_onehot[0, 120*0+48-timesteps:120*0+48, :].shape)
-print(test_pm_aws[0, 120*0+48-timesteps:120*0+48, :])
-print(test_pm_aws[0, 120*0+48-timesteps:120*0+48, :].shape)
 
 
 
 # 5.1 predict
 l=[]
 for j in range(17):
-    
     for k in range(64):
         for i in range(72):
-            test_pm[j, 120*k+i+48, pm_col_num] = globals()['model{}'.format(i+1)].predict\
-                (np.concatenate([test_pm_onehot[j, 120*k+48-timesteps:120*k+48, :], test_pm_aws[j, 120*k+48-timesteps:120*k+48, :]], axis=1)\
-                    .reshape(-1, timesteps, globals()['x{}_train'.format(i+1)].shape[2]).astype(np.float32))
+            test_pm[j, 120*k+i+48, pm_col_num] = globals()[f'model{i+1}'].predict\
+                (np.concatenate([test_pm_month_onehot[j, 120*k+48-timesteps:120*k+48, :], test_pm_aws[j, 120*k+48-timesteps:120*k+48, :]], axis=1)\
+                    .reshape(-1, timesteps, globals()[f'x{i+1}_train'].shape[2]).astype(np.float32))
             print(f'model 변환 진행중{j}의 {k}의 {i}번')
             # print(test_pm[j, 120*k+48:120*k+120, pm_col_num])
         l.append(test_pm[j, 120*k+48:120*k+120, pm_col_num])
@@ -403,7 +455,7 @@ print('# 5.1 Done')
 l = np.array(l).reshape(-1,)
 l = np.round(l/0.004)*0.004
 submission['PM2.5']=l
-submission.to_csv('c:/study_data/_save/dust/_Submit_time0510_0.csv')
+submission.to_csv(path_save + 'pm_0508_' + date +'.csv')
 
 print('# 5.2 Done')
 
@@ -411,7 +463,7 @@ print('# 5.2 Done')
 
 # 5.3 Save weigths
 for i in range(72):
-    globals()['model{}'.format(i+1)].save('c:/study_data/_save/dust/Aiur_Submit{}.h5'.format(i+1))
+    globals()[f'model{i+1}'].save(path_save + f'Aiur_Submit{i+1}' + date +'.h5')
 
 print('# 5.3 Done')
 

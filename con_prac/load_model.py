@@ -1,23 +1,8 @@
-import os
-from typing import Any
+import random
 import numpy as np
 import pandas as pd
-import time
-from xgboost import XGBRegressor
-from sklearn.experimental import enable_iterative_imputer
-from sklearn.impute import IterativeImputer,SimpleImputer
-from sklearn.preprocessing import LabelEncoder, MinMaxScaler
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, LSTM, Dropout, BatchNormalization
-from sklearn.model_selection import train_test_split
-from tensorflow.keras.layers import Input,Conv1D, Flatten
-from tensorflow.keras.models import Model
-from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau
-from catboost import CatBoostRegressor
-from lightgbm import LGBMRegressor
+import os
 import tensorflow as tf
-import glob
-import random
 
 # 0. Set random seed
 seed = 0
@@ -26,7 +11,11 @@ np.random.seed(seed)
 tf.random.set_seed(seed)
 os.environ["PYTHONHASHSEED"] = str(seed)
 
-# 0. gpu 사용여부
+import datetime
+date = datetime.datetime.now()
+date = date.strftime('%m%d_%H%M')
+
+# 0.1 gpu 사용여부
 gpus = tf.config.experimental.list_physical_devices('GPU')
 if gpus:
     try:
@@ -36,16 +25,26 @@ if gpus:
     except RuntimeError as e:
         print(e)        
 
-# 1.0 train, test, answer 데이터 경로 지정 및 가져오기
-path = 'c:/study_data/_data/finedust/'
 
+
+# 1.0 train, test, answer 데이터 경로 지정 및 가져오기
+path = './_data/finedust/'
+
+import glob
 train_pm_path = glob.glob(path + 'TRAIN/*.csv')
 test_pm_path = glob.glob(path + 'TEST_INPUT/*.csv')
 train_aws_path = glob.glob(path + 'TRAIN_AWS/*.csv')
 test_aws_path = glob.glob(path + 'TEST_AWS/*.csv')
-submission = pd.read_csv('c:/study_data/_data/finedust/answer_sample.csv', index_col=0)
+submission = pd.read_csv(path + 'answer_sample.csv', index_col=0)
 
-from preprocess_3 import bring
+def bring(filepath:str)->pd.DataFrame:
+    li = []
+    for i in filepath:
+        df = pd.read_csv(i, index_col=None, header=0, encoding='utf-8-sig')
+        li.append(df)
+    data = pd.concat(li, axis=0, ignore_index=True)
+    return data
+
 train_pm = bring(train_pm_path)
 test_pm = bring(test_pm_path)
 train_aws = bring(train_aws_path)
@@ -56,6 +55,8 @@ print('# 1.0 Done')
 
 
 # 1.1 지역 라벨인코딩
+from sklearn.preprocessing import LabelEncoder
+
 label = LabelEncoder()
 
 train_pm['측정소'] = label.fit_transform(train_pm['측정소'])
@@ -66,8 +67,12 @@ test_aws['지점'] = label.transform(test_aws['지점'].ffill())
 print('# 1.1 Done')
 
 
+
 # 1.2 hour 열 생성 (주기 함수로) & 연도, 일시 열 제거
-from preprocess_3 import get_hourly_features
+def get_hourly_features(hour: int):
+    """주어진 시간(hour)에 대한 사인과 코사인 함수 값을 반환"""
+    radians_per_hour = 2 * np.pi * hour / 24.0
+    return [np.sin(radians_per_hour), np.cos(radians_per_hour)]
 
 train_pm['hour'] = train_pm['일시'].str[6:8].astype('int8')
 train_pm['hour_sin'], train_pm['hour_cos'] = get_hourly_features(train_pm['hour'])
@@ -83,7 +88,12 @@ test_aws = test_aws.drop(['연도', '일시'], axis=1)
 print('# 1.2 Done')
 
 
+
 # 1.3 train_pm/aws 결측치 제거 ( imputer )
+from sklearn.experimental import enable_iterative_imputer
+from sklearn.impute import IterativeImputer
+from xgboost import XGBRegressor
+
 imputer = IterativeImputer(XGBRegressor())
 
 train_pm['PM2.5'] = imputer.fit_transform(train_pm['PM2.5'].values.reshape(-1 , 1)).reshape(-1,)
@@ -109,16 +119,22 @@ print('# 1.3 Done')
 
 
 
-
-
-
-
-
-
-
-
 # 2.0 awsmap, pmmap 경로 지정 및 가져오기
-from preprocess_3 import load_aws_and_pm
+from typing import Tuple
+
+def load_aws_and_pm()->Tuple[pd.DataFrame, pd.DataFrame]:
+    path='./_data/finedust/'
+    path_list = os.listdir(path)
+
+    meta='/'.join([path, path_list[1]])
+    meta_list=os.listdir(meta)
+
+    awsmap = pd.read_csv('/'.join([meta,meta_list[0]]))
+    awsmap = awsmap.drop(awsmap.columns[-1], axis=1)
+    pmmap = pd.read_csv('/'.join([meta,meta_list[1]]))
+    pmmap = pmmap.drop(pmmap.columns[-1], axis=1)
+    return awsmap, pmmap
+
 awsmap, pmmap = load_aws_and_pm()
 
 print('# 2.0 Done')
@@ -142,7 +158,19 @@ print('# 2.2 Done')
 
 
 # 2.3 pm관측소로부터 aws관측소의 거리 구하기 ( 17개 x 30개 )
-from preprocess_3 import distance
+from haversine import haversine
+
+def distance(awsmap:pd.DataFrame,pmmap:pd.DataFrame)->pd.DataFrame:
+    '''pm과 ams관측소 사이의 거리들을 프린트해준다'''
+    a = []
+    for i in range(pmmap.shape[0]):
+        b=[]
+        for j in range(awsmap.shape[0]):
+            b.append(haversine((np.array(pmmap)[i, 1], np.array(pmmap)[i, 2]), (np.array(awsmap)[j, 1], np.array(awsmap)[j, 2])))
+        a.append(b)
+    distance = pd.DataFrame(np.array(a),index=pmmap['Location'],columns=awsmap['Location'])
+    return distance
+
 dist = distance(awsmap, pmmap)
 
 print('# 2.3 Done')
@@ -150,7 +178,36 @@ print('# 2.3 Done')
 
 
 # 2.4 pm관측소에서 가장 가까운 n(default=3)개의 aws관측소의 인덱스 번호와 환산 가중치 반환
-from preprocess_3 import scaled_score
+def scaled_score(distance:pd.DataFrame,pmmap:pd.DataFrame,near:int=3)->Tuple[pd.DataFrame,np.ndarray]:
+    '''pm으로부터 가까운 상위 near개의 환산점수'''
+    min_i=[]
+    min_v=[]
+    for i in range(distance.shape[0]):
+        min_i.append(np.argsort(distance.values[i,:])[:near])
+        min_v.append(distance.values[i, min_i[i]])
+
+    min_i = np.array(min_i)
+    min_v = pd.DataFrame(np.array(min_v),index=distance.index)
+    
+    for i in range(pmmap.shape[0]):
+        for j in range(near):
+            min_v.values[i, j]=min_v.values[i, j]**2
+            
+    sum_min_v = np.sum(min_v, axis=1)
+
+    recip=[]
+    for i in range(pmmap.shape[0]):
+        recip.append(sum_min_v[i]/min_v.values[i, :])
+    recip = np.array(recip)
+    recip_sum = np.sum(recip, axis=1)
+    coef = 1/recip_sum
+
+    result = []
+    for i in range(pmmap.shape[0]):
+        result.append(recip[i, :]*coef[i])
+    result = pd.DataFrame(np.array(result),index=distance.index)
+    return result, min_i
+
 result, min_i = scaled_score(dist, pmmap)
 dist = dist.values
 result = result.values
@@ -169,7 +226,6 @@ train_pm_aws = []
 for i in range(17):
     train_pm_aws.append(train_aws[min_i[i, 0], :, 1:]*result[0, 0] + train_aws[min_i[i, 1], :, 1:]*result[0, 1] + train_aws[min_i[i, 2], :, 1:]*result[0, 2])
 train_pm_aws = np.array(train_pm_aws)
-print(train_pm_aws.shape)
 
 test_pm_aws = []
 for i in range(17):
@@ -178,7 +234,7 @@ for i in range(17):
 test_pm_aws = np.array(test_pm_aws)
 
 print('# 2.5 Done')
-    
+
 
 
 # 2.6 지역 column drop
@@ -231,27 +287,9 @@ for i in range(17):
         test_pm_onehot.append(np.concatenate([test_pm[i, j, :], labels[i, :]]))
 
 test_pm_onehot = np.array(test_pm_onehot).reshape(17, -1, test_pm.shape[2]+k)
-
-print('# 2.9 Done')
-
-# pm 의 열
-# 괄호친 열은 제거
-# (측정소) PM2.5 (momth) (hour) hour_sin hour_cos = ( None, 3 )
-
-# pm_aws의 열
-# (지역) 기온 풍향 풍속 강수량 습도 = ( None, 5 )
-
-
-# train_data 의 열 ( 훈련 시킬 x값 )
-# pm열 + onehot의 열 + pm_aws의 열
-# [(측정소) PM2.5 (month) (hour) hour_sin hour_cos] + [ onehot_1, onehot_2, onehot_3 ] + [(지역) 기온 풍향 풍속 강수량 습도] = ( None, 11 )
-#             0                     1        2             3         4         5                  6   7    8    9    10
-
 pm_col_num = 0
 
-
-
-
+print('# 2.9 Done')
 
 
 
@@ -263,11 +301,20 @@ pm_col_num = 0
 
 
 # 3.1 split_x
-timesteps = 8
+timesteps = 6
 
-from preprocess_3 import split_x
+def split_x(dt, ts, pred_date):
+    a = []
+    for j in range(dt.shape[0]):
+        b = []
+        for i in range(dt.shape[1]-ts-pred_date):
+            c = dt[j, i:i+ts, :]
+            b.append(c)
+        a.append(b)
+    return np.array(a)
+
 for i in range(72):
-    globals()['x{}'.format(i+1)] = split_x(train_data, timesteps, i).reshape(-1, timesteps, train_data.shape[2])
+    globals()[f'x{i+1}'] = split_x(train_data, timesteps, i).reshape(-1, timesteps, train_data.shape[2])
 
 print('# 3.1 Done')
 
@@ -275,57 +322,33 @@ print('# 3.1 Done')
 
 # 3.2 split_y
 for i in range(72):
-    globals()['y{}'.format(i+1)] = []
+    globals()[f'y{i+1}'] = []
     for j in range(train_data.shape[0]):
-        globals()['y{}'.format(i+1)].append(train_data[j, timesteps+i:, pm_col_num].reshape(-1,))
-    globals()['y{}'.format(i+1)] = np.array(globals()['y{}'.format(i+1)]).reshape(-1,)
+        globals()[f'y{i+1}'].append(train_data[j, timesteps+i:, pm_col_num].reshape(-1,))
+    globals()[f'y{i+1}'] = np.array(globals()[f'y{i+1}']).reshape(-1,)
 
 print('# 3.2 Done')
 
 
 
 # 3.3 train_test_split
+from sklearn.model_selection import train_test_split
+
 for i in range(72):
-    globals()['x{}_train'.format(i+1)], globals()['x{}_test'.format(i+1)], globals()['y{}_train'.format(i+1)], globals()['y{}_test'.format(i+1)] = train_test_split(globals()['x{}'.format(i+1)], globals()['y{}'.format(i+1)], train_size=0.7, random_state=seed, shuffle=True)
+    globals()[f'x{i+1}_train'], globals()[f'x{i+1}_test'], globals()[f'y{i+1}_train'], globals()[f'y{i+1}_test'] = train_test_split(globals()[f'x{i+1}'], globals()[f'y{i+1}'], train_size=0.7, random_state=seed, shuffle=True)
 
 print('# 3.3 Done')
 
 
 
-# 3.4 Scaler
-# scaler = MinMaxScaler()
-
-# for i in range(72):
-#     globals()['x{}_train'.format(i+1)] = globals()['x{}_train'.format(i+1)].reshape(-1, globals()['x{}'.format(i+1)].shape[2])
-#     globals()['x{}_test'.format(i+1)] = globals()['x{}_test'.format(i+1)].reshape(-1, globals()['x{}'.format(i+1)].shape[2])
-
-#     globals()['x{}_train'.format(i+1)][:, pm_col_num+3:], globals()['x{}_test'.format(i+1)][:, pm_col_num+3:] = scaler.fit_transform(globals()['x{}_train'.format(i+1)][:, pm_col_num+3:]), scaler.transform(globals()['x{}_test'.format(i+1)][:, pm_col_num+3:])
-
-# test_pm_aws = scaler.transform(test_pm_aws.reshape(-1, test_pm_aws.shape[2])).reshape(-1, timesteps, test_pm_aws.shape[2])
-
+# 3.4 데이터 용량 줄이기 ( float 64 -> float 32 )
+for i in range(72):
+    globals()[f'x{i+1}_train']=globals()[f'x{i+1}_train'].reshape(-1, timesteps, globals()[f'x{i+1}'].shape[2]).astype(np.float32)
+    globals()[f'x{i+1}_test']=globals()[f'x{i+1}_test'].reshape(-1, timesteps, globals()[f'x{i+1}'].shape[2]).astype(np.float32)
+    globals()[f'y{i+1}_train']=globals()[f'y{i+1}_train'].astype(np.float32)
+    globals()[f'y{i+1}_test']=globals()[f'y{i+1}_test'].astype(np.float32)
 
 print('# 3.4 Done')
-
-
-
-# 3.5 데이터 용량 줄이기 ( float 64 -> float 32 )
-for i in range(72):
-    globals()['x{}_train'.format(i+1)]=globals()['x{}_train'.format(i+1)].reshape(-1, timesteps, globals()['x{}'.format(i+1)].shape[2]).astype(np.float32)
-    globals()['x{}_test'.format(i+1)]=globals()['x{}_test'.format(i+1)].reshape(-1, timesteps, globals()['x{}'.format(i+1)].shape[2]).astype(np.float32)
-    globals()['y{}_train'.format(i+1)]=globals()['y{}_train'.format(i+1)].astype(np.float32)
-    globals()['y{}_test'.format(i+1)]=globals()['y{}_test'.format(i+1)].astype(np.float32)
-
-print('# 3.5 Done')
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -337,6 +360,8 @@ print('# 3.5 Done')
 
 
 # 4.1 Model, Compile, fit
+from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau
+
 es = EarlyStopping(
     monitor='val_loss',
     restore_best_weights=True,
@@ -348,22 +373,29 @@ rl = ReduceLROnPlateau(
     patience=2,
 )
 
+from tensorflow.keras.models import load_model
 
+# for i in range(72):
+#     globals()[f'model{i+1}'] = load_model(f"C:/AIA/finedust/pm2.5_code/Aiur_Submit_1353/Aiur_Submit{i+1}.h5")
+
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, LSTM
 
 for i in range(72):
-    globals()['model{}'.format(i+1)] = Sequential()
-    globals()['model{}'.format(i+1)].add(LSTM(32, input_shape=(timesteps, x1_train.shape[2])))
-    globals()['model{}'.format(i+1)].add(Dense(64, activation='relu'))
-    globals()['model{}'.format(i+1)].add(Dense(32, activation='relu'))
-    globals()['model{}'.format(i+1)].add(Dense(1))
-    globals()['model{}'.format(i+1)].compile(loss='mae', optimizer='adam')
+    globals()[f'model{i+1}'] = Sequential()
+    globals()[f'model{i+1}'].add(LSTM(32, input_shape=(timesteps, x1_train.shape[2])))
+    globals()[f'model{i+1}'].add(Dense(32, activation='relu'))
+    globals()[f'model{i+1}'].add(Dense(8, activation='relu'))
+    globals()[f'model{i+1}'].add(Dense(1))
     
-    globals()['model{}'.format(i+1)].fit(
-        globals()['x{}_train'.format(i+1)], globals()['y{}_train'.format(i+1)],
+    globals()[f'model{i+1}'].compile(loss = 'mae', optimizer = 'adam')
+    
+    globals()[f'model{i+1}'].fit(
+        globals()[f'x{i+1}_train'], globals()[f'y{i+1}_train'],
         batch_size=1024,
         epochs=50,
         callbacks=[es,rl],
-        validation_split=0.25)
+        validation_split=0.2)
     print(f'{i}번쨰 훈련 완료')
 
 print('# 4.1 Done')
@@ -375,24 +407,18 @@ print('# 4.1 Done')
 
 
 
-print(test_pm_onehot[0, 120*0+48-timesteps:120*0+48, :])
-print(test_pm_onehot[0, 120*0+48-timesteps:120*0+48, :].shape)
-print(test_pm_aws[0, 120*0+48-timesteps:120*0+48, :])
-print(test_pm_aws[0, 120*0+48-timesteps:120*0+48, :].shape)
-
 
 
 # 5.1 predict
 l=[]
 for j in range(17):
-    
     for k in range(64):
         for i in range(72):
-            test_pm[j, 120*k+i+48, pm_col_num] = globals()['model{}'.format(i+1)].predict\
+            test_pm[j, 120*k+i+48, pm_col_num] = globals()[f'model{i+1}'].predict\
                 (np.concatenate([test_pm_onehot[j, 120*k+48-timesteps:120*k+48, :], test_pm_aws[j, 120*k+48-timesteps:120*k+48, :]], axis=1)\
                     .reshape(-1, timesteps, globals()['x{}_train'.format(i+1)].shape[2]).astype(np.float32))
             print(f'model 변환 진행중{j}의 {k}의 {i}번')
-            # print(test_pm[j, 120*k+48:120*k+120, pm_col_num])
+            print(test_pm[j, 120*k+48:120*k+120, pm_col_num])
         l.append(test_pm[j, 120*k+48:120*k+120, pm_col_num])
 
 print('# 5.1 Done')
@@ -402,8 +428,20 @@ print('# 5.1 Done')
 # 5.2 Save Submit
 l = np.array(l).reshape(-1,)
 l = np.round(l/0.004)*0.004
+l = l.reshape(17, -1)
+
+for j in range(17):
+    for i in range(64):
+        l[j, 12+72*i:56+72*i] = l[j, 12+72*i:56+72*i] - 0.004
+        l[j, 56+72*i:68+72*i] = l[j, 56+72*i:68+72*i] - 0.008
+        l[j, 68+72*i:72+72*i] = l[j, 68+72*i:72+72*i] - 0.012
+
+l = l.reshape(-1,)
+
 submission['PM2.5']=l
-submission.to_csv('c:/study_data/_save/dust/_Submit_time0510_0.csv')
+
+path_save = './_save/finedust/'
+submission.to_csv(path_save + '재현성확인용' + date + '.csv')
 
 print('# 5.2 Done')
 
@@ -411,7 +449,7 @@ print('# 5.2 Done')
 
 # 5.3 Save weigths
 for i in range(72):
-    globals()['model{}'.format(i+1)].save('c:/study_data/_save/dust/Aiur_Submit{}.h5'.format(i+1))
+    globals()[f'model{i+1}'].save(f'./_save/finedust/Aiur_Submit{i+1}.h5')
 
 print('# 5.3 Done')
 
