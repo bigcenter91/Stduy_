@@ -5,7 +5,7 @@ import os
 import tensorflow as tf
 
 # 0. Set random seed
-seed = 0
+seed = 524
 random.seed(seed)
 np.random.seed(seed)
 tf.random.set_seed(seed)
@@ -28,7 +28,7 @@ if gpus:
 
 
 # 1.0 train, test, answer 데이터 경로 지정 및 가져오기
-path = './_data/finedust/'
+path = 'c:/study_data/_data/finedust/'
 
 import glob
 train_pm_path = glob.glob(path + 'TRAIN/*.csv')
@@ -123,7 +123,7 @@ print('# 1.3 Done')
 from typing import Tuple
 
 def load_aws_and_pm()->Tuple[pd.DataFrame, pd.DataFrame]:
-    path='./_data/finedust/'
+    path='c:/study_data/_data/finedust/'
     path_list = os.listdir(path)
 
     meta='/'.join([path, path_list[1]])
@@ -440,7 +440,7 @@ l = l.reshape(-1,)
 
 submission['PM2.5']=l
 
-path_save = './_save/finedust/'
+path_save = 'c:/study_data/_save/dust/'
 submission.to_csv(path_save + '재현성확인용' + date + '.csv')
 
 print('# 5.2 Done')
@@ -449,7 +449,7 @@ print('# 5.2 Done')
 
 # 5.3 Save weigths
 for i in range(72):
-    globals()[f'model{i+1}'].save(f'./_save/finedust/Aiur_Submit{i+1}.h5')
+    globals()[f'model{i+1}'].save(f'c:/study_data/_save/dust/Aiur_Submit{i+1}.h5')
 
 print('# 5.3 Done')
 
