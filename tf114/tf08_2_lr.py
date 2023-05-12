@@ -33,9 +33,10 @@ hypothesis = x * w + b
 loss = tf.reduce_mean(tf.square(hypothesis - y)) # mse
 # learning_rate만큼 줄어든다 epochs가 지날 수록 우리가 원하는 값으로 되겠지?
 
-optimizer = tf.train.GradientDescentOptimizer(learning_rate=0.002)
+optimizer = tf.train.GradientDescentOptimizer(learning_rate=0.002) # 향상에 상당한 도움을 주는게 learning_rate
 train = optimizer.minimize(loss)
 # model.compile(loss='mse', optimizer='sgd')
+# localminima?
 
 #3-2 . 훈련
 with tf.compat.v1.Session() as sess:

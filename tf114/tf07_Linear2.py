@@ -27,3 +27,4 @@ for step in range(epochs):
     sess.run(train)
     if step %20 == 0:
         print(step, sess.run(loss), sess.run(w), sess.run(b))
+# 세션을 열고 닫는거 귀찮으니까 with문 안에 넣어서 쓴거야
