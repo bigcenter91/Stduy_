@@ -41,16 +41,16 @@ for feature in ordinal_features:
     x_test[feature] = le.transform(x_test[feature])
     
 
-parameters = {'n_estimators' : [500, 1000],
-              'learning_rate' : [0.1, 0.001],
-              'max_depth' : [3, 5],
-              'gamma' : [0,1],
-              'min_child_weight' : [1],
-              'subsample' : [1],
-              }
+# parameters = {'n_estimators' : [500, 1000],
+#               'learning_rate' : [0.1, 0.001],
+#               'max_depth' : [3, 5],
+#               'gamma' : [0,1],
+#               'min_child_weight' : [1],
+#               'subsample' : [1],
+#               }
 
 
-model = XGBClassifier(parameters, random_state=915)
+model = XGBClassifier(random_state=524)
 
 model.fit(x_train, y_train)
 
@@ -67,4 +67,4 @@ submit['TARGET'] = pred
 submit.head()
 
 # 예측한 결과를 파일로 저장합니다. index 인자의 값을 False로 설정하지 않으면 제출이 정상적으로 진행되지 않습니다.
-submit.to_csv('0515_1_submit.csv', index = False)
+submit.to_csv('0515_5_submit.csv', index = False)
