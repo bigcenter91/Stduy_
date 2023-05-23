@@ -68,7 +68,7 @@ hist = model.fit(x_train, y_train,
           verbose=1, # 0이냐 0이 아닌거냐
         #   eval_metric='logloss,'
           eval_metric='error', # 이진 분류
-        #   eval_metric='auc',   # d이진
+        #   eval_metric='auc',   # 이진
         # val_metric='merror',   # 이진
         #   eval_metric='rmse', mae, rmsle  # 회귀
         #  
