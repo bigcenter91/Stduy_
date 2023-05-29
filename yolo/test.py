@@ -3,7 +3,7 @@ from ultralytics import YOLO
 
 model = YOLO('yolov8n.pt')
 
-video_path = 'C:\study_data\_data\_ydata\kk20220917_200209.mp4'
+video_path = 'C:\study_data\_data\_ydata\g20230526_154008.mp4'
 cap = cv2.VideoCapture(video_path)
 # cap = cv2.VideoCapture(0)
 
