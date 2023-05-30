@@ -1,0 +1,41 @@
+python Super 클래스 이해
+
+Super 클래스 전 오버라이딩부터 이해 해야한다
+
+오버라이드(Override)
+- 기반의 클래스의 매소드를 무시하고 새로운 메소드를 만든다
+
+class father():  # 부모 클래스
+    def handsome(self):
+        print("잘생겼다")
+ 
+class son(father):  # 자식 클래스(부모 클래스) 아빠 메소드를 상속받겠다
+    '''아들'''
+ 
+class daughter(father):  # 자식 클래스(부모 클래스) 아빠 메소드를 상속받겠다
+    def pretty(self):
+        print("예쁘다")
+ 
+    def handsome(self):
+ 
+ 
+boy = brother()
+boy.handsome()
+ 
+girl = daughter()
+girl.handsome()
+girl.pretty()
+
+
+####################
+위 코드를 보면 아버지에서 handsome이라는 메소드를 아들과 딸이 상속받았으나
+아들은 잘생겼다가 출력 되었지만 딸은 예쁘다라고 사용 중이였기 때문에 무시를 하게된다
+이것을 오바라이드라고 한다
+
+
+Super() 클래스
+- 자식 클래스에서 부모 클래스의 내용을 사용하고 싶은 경우
+
+위 코드에서 딸 부분에서
+def handsome(self): 밑에 super().handsome()을 추가해주면
+딸의 출력결과를 보면 잘생겼다가 나오는 것을 확인 할 수 있다

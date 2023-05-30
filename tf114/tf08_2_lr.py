@@ -1,0 +1,76 @@
+# 실습
+# lr 수정해서 epoch 100번 이하로 줄여
+# step = 100, 이하, w=1.99, b=0.99
+
+import tensorflow as tf
+tf.set_random_seed(337)
+
+#1. 데이터
+
+x = tf.placeholder(tf.float32, shape=[None])
+y = tf.placeholder(tf.float32, shape=[None])
+
+w = tf.Variable(tf.random_normal([1]), dtype=tf.float32)
+b = tf.Variable(tf.random_normal([1]), dtype=tf.float32)
+# uniform 균등분포
+
+sess = tf.compat.v1.Session()
+sess.run(tf.global_variables_initializer())
+print(sess.run(w)) #[-0.4121612]
+
+# with tf.compat.v1.Session() as sess:
+
+
+
+#2. 모델 구성
+# y = wx + b
+# weight가 앞에 있느냐 뒤에 있느냐 값이 다르다
+
+hypothesis = x * w + b
+
+
+#3-1. 컴파일
+loss = tf.reduce_mean(tf.square(hypothesis - y)) # mse
+# learning_rate만큼 줄어든다 epochs가 지날 수록 우리가 원하는 값으로 되겠지?
+
+optimizer = tf.train.GradientDescentOptimizer(learning_rate=0.002) # 향상에 상당한 도움을 주는게 learning_rate
+train = optimizer.minimize(loss)
+# model.compile(loss='mse', optimizer='sgd')
+# localminima?
+
+#3-2 . 훈련
+with tf.compat.v1.Session() as sess:
+# sess = tf.compat.v1.Session()
+    sess.run(tf.global_variables_initializer())
+
+    epochs = 75
+    for step in range(epochs):
+        # sess.run
+        _, loss_val, w_val, b_val = sess.run([train, loss, w, b],
+                                             feed_dict={x:[1,2,3,4,5], y:[2,4,6,8,10]})
+        if step %20 == 0:
+            # print(step, sess.run(loss), sess.run(w), sess.run(b)) # verbose가 되겠지?
+            print(step, loss_val, w_val, b_val) # verbose가 되겠지?
+            
+    # y_predict = sess.run(hypothesis, feed_dict={x: [6, 7, 8]})
+    # print("예측 값:", y_predict)
+        
+        
+# 그래프 연산방식은 그래프를 만들어 그리고 한방에 툭!
+# placeholer에는 feed_dict이 따라다닌다
+
+######################## [실습] ########################
+
+# x_data = [6,7,8]
+# 예측값을 뽑아라
+########################################################
+# placeholder를 정의하고 
+
+    x_data = [6,7,8]
+
+    x_test = tf.compat.v1.placeholder(tf.float32, shape=[None])
+
+    y_predict = x_test * w_val + b_val
+
+    print('[6,7,8]의 예측 값 : ',
+        sess.run(y_predict, feed_dict={x_test:x_data}))

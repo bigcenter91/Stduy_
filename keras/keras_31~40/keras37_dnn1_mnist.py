@@ -22,7 +22,7 @@ x_test = x_test.reshape(10000, 784)
 y_train = to_categorical(y_train)
 y_test = to_categorical(y_test)
 
-print(x_train.shape)
+print(y_train.shape)
 print(x_test.shape)
 
 

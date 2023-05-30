@@ -6,8 +6,8 @@ import numpy as np
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from sklearn.model_selection import train_test_split
 
-path = 'd:/study_data/_data/cat_dog/petimages/'
-save_path = 'd:/study_data/_save/cat_dog/'
+path = 'c:/study_data/_data/cat_dog/petimages/'
+save_path = 'c:/study_data/_save/cat_dog/'
 
 # np.save(save_path + '파일명', arr=)
 
@@ -18,7 +18,7 @@ datasets = ImageDataGenerator(
 
 
 xy_data = datasets.flow_from_directory(
-        'd:/study_data/_data/cat_dog/PetImages/',
+        'c:/study_data/_data/cat_dog/PetImages/',
         target_size=(100, 100),
         batch_size=5000,
         class_mode='binary',
