@@ -1,0 +1,27 @@
+발표 순서 전략적으로 짜
+
+skip connection
+
+bottleNeck
+
+용어설명 프로젝트 기간에 설명하라고 할거야
+
+디텍션 원스테이지 투스테이즈
+
+
+정리
+
+이미지
+- 디텍션
+2스테이지 RNN - FRCNN - FSTERRCNN - MASK RCNN
+1스테이지 YOLO(가장 마지막 논문)
+2스테이지 하는 이유 1스테이지를 확실하게 알기 위해
+
+- GAN
+dual style gan2 + 아무거나
+
+자연어
+attention - T.F - Bert + 후발 주자 중 하나	
+	       - GPT
+
+V.F가 추가로 나왔다
