@@ -1,0 +1,4 @@
+python 클래스 super 이해
+
+먼저 override를 이해
+override: 같은 이름을 가진 메소드를
