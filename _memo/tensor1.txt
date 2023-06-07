@@ -1,0 +1,23 @@
+tensor 1
+
+conda create -n tf114cpu python=3.6.13
+
+(tf114cpu) C:\Users\cuda>pip install tensorflow==1.14
+
+
+
+
+
+
+
+
+행렬 곱
+
+앞에 행과 뒤에 열이 곱해진다
+
+[1,2]    [5, 6]을 세로로 바꿔줘야하니까 전치 해야된다
+[3,4]
+
+
+
+
