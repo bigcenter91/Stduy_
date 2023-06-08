@@ -1,0 +1,6 @@
+f1c356ffba44f0797231cb3a14d00f83ab268146 
+insert -> edit ->esc->:wq 
+$ git rebase --continue
+$ git commit --amend --no-edit --date="Mar 23 11:23:00 2023 +0000"$ 
+git rebase --continue
+$ git push -f origin main

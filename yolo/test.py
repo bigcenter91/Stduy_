@@ -3,9 +3,11 @@ from ultralytics import YOLO
 
 model = YOLO('yolov8n.pt')
 
-video_path = 'C:\study_data\_data\_ydata\ss20230605_224916.mp4'
-cap = cv2.VideoCapture(video_path)
-# cap = cv2.VideoCapture(0)
+# video_path = 'C:\study_data\_data\_ydata\ss20230605_224916.mp4'
+# cap = cv2.VideoCapture(video_path)
+
+cap = cv2.VideoCapture(0)
+
 
 while cap.isOpened():
     success, frame = cap.read()
