@@ -23,11 +23,11 @@ conda env list: 가상환경 리스트 확인
 
 activate '가상환경 이름'
 
-설치된거 확인: 'pip listㅁㅊ
+설치된거 확인: 'pip list
 
 tensorflow 설치: pip install tensorflow-gpu==2.7.4
 
-conda remove -name '환경 이름': 가상환경 제거
+conda env remove -n 가상환경이름 : 가상환경 제거
 
 
 
