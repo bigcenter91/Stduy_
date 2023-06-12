@@ -1,0 +1,15 @@
+for i in thresholds :
+    selection = SelectFromModel(model, threshold=i, prefit=True)
+    select_x_train = selection.transform(x_train)
+    select_x_test = selection.transform(x_test)
+    
+    selection_model = XGBRegressor()
+    selection_model.set_params(early_stopping_rounds = 10, **parameters, eval_metric='rmse') 
+    selection_model.fit(select_x_train, y_train,
+                        eval_set=[(select_x_train, y_train), (select_x_test, y_test)],
+                        verbose=0)
+    
+    select_y_predict = selection_model.predict(select_x_test)
+    score = r2_score(y_test, select_y_predict)
+    
+    print("Tresh=%.3f, n=%d, R2: %.2f%%" %(i, select_x_train.shape[1], score*100))
