@@ -1,0 +1,8 @@
+y값이 너무 치우쳐져있으면 로그변환
+
+
+https://keras.io/getting_started/faq/
+
+https://blockchainstudy.tistory.com/49
+
+https://ballentain.tistory.com/84
